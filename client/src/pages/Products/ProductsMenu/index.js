@@ -79,9 +79,9 @@ const ProductsMenu = () => {
             </div>
             <div className="grid-5">
               <h5>ASTORIA AVANT</h5>
-              <h6 className="color-1">Máquina Disponível</h6>
+              <h6 className="color-1 link">Máquina Disponível</h6>
               <p className="mt-1 mb-1">Avant é uma máquina de café pronta para se adaptar a todas as situações. Estilo com linhas elegantes e modernas, projeto elegante, decorado com detalhes cromados brilhantes que complementam o caráter com gosto muito refinado. Dentro, toda a experiência e tecnologia da Astoria oferecem alta confiabilidade e elevada confiança para um resultado final de excelente qualidade das bebidas fornecidas.</p>
-              <h6 className="color-1 h7">Especificações</h6>
+              <h6 className="color-1 h7 link">Especificações</h6>
               <p className="mt-1">- Entrada automática de água; // - Lança de Vapor; // Sistema de fornecimento de água quente; // Programação de 4 doses por grupo; // Voltagem: 220V</p>
               
               <button className="btn mt-2 btn-click">Verificar disponibilidade</button>
@@ -94,9 +94,9 @@ const ProductsMenu = () => {
             </div>
             <div className="grid-5">
               <h5>ASTORIA CALYPSO</h5>
-              <h6 className="color-1">Máquina Disponível</h6>
+              <h6 className="color-1 link">Máquina Disponível</h6>
               <p className="mt-1 mb-1">Calypso é a máquina tradicional que garante uma extraordinária qualidade na extração do café, combinando tecnologia e estilo. Calypso é precisa, confiável e o seu design com traços simples e elegantes torna-a perfeita para qualquer tipo de decoração: torna cada pausa para café um verdadeiro momento de prazer. Uma máquina de dois grupos compacta ideal para quem precisa de espaço.</p>
-              <h6 className="color-1 h7">Especificações</h6>
+              <h6 className="color-1 h7 link">Especificações</h6>
               <p className="mt-1">- Entrada automática de água; // - Lança de Vapor; // Sistema de fornecimento de água quente; // Programação de 6 doses por grupo; // Voltagem: 220V</p>
               
               <button className="btn mt-2 btn-click">Verificar disponibilidade</button>
@@ -111,9 +111,9 @@ const ProductsMenu = () => {
             </div>
             <div className="grid-5">
               <h5>JURA</h5>
-              <h6 className="color-1">Máquina Disponível</h6>
+              <h6 className="color-1 link">Máquina Disponível</h6>
               <p className="mt-1 mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <h6 className="color-1 h7">Especificações</h6>
+              <h6 className="color-1 h7 link">Especificações</h6>
               <p className="mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
               
               <button className="btn mt-2 btn-click">Verificar disponibilidade</button>
@@ -127,9 +127,9 @@ const ProductsMenu = () => {
             </div>
             <div className="grid-5">
               <h5>BUNN</h5>
-              <h6 className="color-1">Máquina Disponível</h6>
+              <h6 className="color-1 link">Máquina Disponível</h6>
               <p className="mt-1 mb-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-              <h6 className="color-1 h7">Especificações</h6>
+              <h6 className="color-1 h7 link">Especificações</h6>
               <p className="mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ornare urna pharetra ut ac, pellentesque. Ultricies habitasse pretium purus viverra. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
               
               <button className="btn mt-2 btn-click">Verificar disponibilidade</button>

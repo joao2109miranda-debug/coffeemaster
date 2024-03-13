@@ -1,19 +1,19 @@
-import Logo from '../../svg/icon-logo.svg'; // ou blog-logo.svg conforme o seu arquivo
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext, useEffect, useState } from 'react';
 import Context from 'pages/Context';
 import api from 'services/api';
+import Logo from '../../svg/icon-logo.svg'
 
 const Header = () => {
   const { token, idUser, setToken, setIdUser } = useContext(Context);
   const [nameUser, setNameUser] = useState('');
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (token && idUser) {
-      api.get(`/users/${idUser}`) // Certifique-se de que a rota está correta conforme a API
+      api.get(`/users/${idUser}`)
         .then((response) => {
-          setNameUser(response.data.name); // Ajuste conforme a estrutura da sua resposta da API
+          setNameUser(response.data.name);
         })
         .catch((error) => {
           console.error("Erro ao buscar informações do usuário", error);
@@ -27,6 +27,22 @@ const Header = () => {
     sessionStorage.removeItem('token');
     navigate('/');
   };
+
+  useEffect(() => {
+    const bx = document.querySelector('.bx');
+    const menuMobile = document.querySelector('.menu-mobile');
+
+    const handleClick = () => {
+      bx.classList.toggle('activebx');
+      menuMobile.classList.toggle('showmenu');
+    };
+
+    bx.addEventListener('click', handleClick);
+
+    return () => {
+      bx.removeEventListener('click', handleClick);
+    };
+  }, []);
 
   return (
     <>
@@ -43,20 +59,14 @@ const Header = () => {
           </ul>
         </nav>
         <div className="flex-start-row">
-        {
-
-!token
-? (
-  <>
-    <div className="cta-desktop ml-3">
-      <Link to="/login" className="btn">Acessar</Link>
-    </div>
-    <div className="cta-mobile mr-1">
-      <Link to="/login" className="link h7">Acessar</Link>
-    </div>
-  </>
-          )
-          : (
+          <div className="bx"></div>
+          {!token ? (
+            <>
+              <div className="cta-desktop ml-3">
+                <Link to="/login" className="btn">Acessar</Link>
+              </div>
+            </>
+          ) : (
             <>
               <div className="cta-desktop ml-3">
                 <Link to="/profile" className="link">{nameUser}</Link>
@@ -64,18 +74,27 @@ const Header = () => {
                 <a href="#" onClick={handleLogout} className="link">Sair</a>
               </div>
               <div className="cta-mobile mr-1">
-                <Link to="/profile" className="link">{nameUser}</Link>
+                <Link to="/profile" className="link acesso">{nameUser}</Link>
                 <span> &nbsp; | &nbsp;</span>
                 <a href="#" onClick={handleLogout} className="link">Sair</a>
               </div>
             </>
-          )
-
-        }
-
+          )}
         </div>
       </header>
-      {/* Adicione aqui outros elementos, se necessário */}
+
+      <div className="relative">
+        <div className="menu-mobile">
+          <ul className="nav-mobile">
+            <li><Link to="/about" className="link-menu-mobile">Sobre</Link></li>
+            <li><Link to="/products" className="link-menu-mobile">Produtos</Link></li>
+            <li><Link to="/allposts" className="link-menu-mobile">Blog</Link></li>
+            <li><Link to="/contact" className="link-menu-mobile">Contato</Link></li>
+            <li><Link to="/login" className="link-menu-mobile acess">Acessar</Link></li>
+
+          </ul>
+        </div>
+      </div>
     </>
   );
 };

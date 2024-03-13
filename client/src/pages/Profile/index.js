@@ -109,10 +109,6 @@ const Profile = () => {
               Olá, bom dia! Seja bem-vindo ao blog. Compartilhe conhecimento.
             </p>
           </div>
-          <div className="grid-6 flex-center">
-            <a href="#" className="btn">Adicionar post</a>
-            <a href="#" className="btn ml-4">Meus dados</a>
-          </div>
         </div>
       </section>
 

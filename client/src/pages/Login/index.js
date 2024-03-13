@@ -23,11 +23,15 @@ const Login = () => {
     event.preventDefault();
 
     try {
+      console.log("Enviando requisição de login para o servidor...");
+
       const response = await api.post('/login', {
         user: form.user,
         password: form.password,
 
       });
+
+      console.log("Resposta do servidor recebida:", response);
 
       if (response.status >= 200 && response.status < 300) {
         if (response.data.token) {
@@ -78,8 +82,8 @@ const Login = () => {
           <img src={BlogLogo} className="icon-l" alt="" />
         </div>
         <div className="row">
-          <div className="grid-4 disappear"></div>
-          <div className="grid-4">
+          <div className="grid-3 disappear"></div>
+          <div className="grid-6">
             <form onSubmit={handleLogin}>
               <h5 className="text-center">
                 Olá, faça o login para continuar.
@@ -105,7 +109,7 @@ const Login = () => {
               <button className="btn w-100 mt-5">Entrar</button>
             </form>
           </div>
-          <div className="grid-4 disappear"></div>
+          <div className="grid-3 disappear"></div>
         </div>
       </section>
       <Footer />
