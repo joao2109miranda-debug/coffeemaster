@@ -8,6 +8,7 @@ import supabase from "services/supabase";
 const emptyForm = {
   id: null,
   name: "",
+  brand: "astoria",
   available: true,
   description: "",
   specification: "",
@@ -64,6 +65,7 @@ const ProductAdmin = () => {
     setForm({
       id: p.id,
       name: p.name || "",
+      brand: p.brand || "astoria",
       available: !!p.available,
       description: p.description || "",
       specification: p.specification || "",
@@ -100,6 +102,7 @@ const ProductAdmin = () => {
       const imageUrl = await uploadIfNeeded();
       const payload = {
         name: form.name.trim(),
+        brand: form.brand,
         available: form.available,
         description: form.description,
         specification: form.specification,
@@ -178,12 +181,20 @@ const ProductAdmin = () => {
 
         <form onSubmit={handleSubmit} className="admin-form">
           <div className="row p-0">
-            <div className="grid-8 p-0">
+            <div className="grid-6 p-0">
               <label htmlFor="name"><h6 className="mb-1">Nome (Título)</h6></label>
               <input type="text" id="name" name="name" value={form.name} onChange={onChange} placeholder="Ex.: Astoria Calypso" />
             </div>
-            <div className="grid-4 p-0">
-              <label htmlFor="available"><h6 className="mb-1">Disponibilidade da máquina</h6></label>
+            <div className="grid-3 p-0">
+              <label htmlFor="brand"><h6 className="mb-1">Marca</h6></label>
+              <select id="brand" name="brand" value={form.brand} onChange={onChange}>
+                <option value="astoria">Astoria</option>
+                <option value="jura">JURA</option>
+                <option value="bunn">Bunn</option>
+              </select>
+            </div>
+            <div className="grid-3 p-0">
+              <label htmlFor="available"><h6 className="mb-1">Disponibilidade</h6></label>
               <select
                 id="available"
                 name="available"

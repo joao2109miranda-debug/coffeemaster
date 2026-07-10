@@ -3146,3 +3146,94 @@ button.link-btn {
   .hero-overlay .p-hero { font-size: 4vw; line-height: 1.3; }
   .hero-overlay .btn-hero { font-size: 4vw; padding: 12px 26px; }
 }
+
+/* ================================================================
+   FILTROS DE PRODUTO (barra de busca + chips)
+   ================================================================ */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid #2c1a19;
+  border-radius: 999px;
+  background: linear-gradient(160deg, #1a1010, #120c0c);
+  margin: 8px 0 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+}
+.filter-search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+}
+.filter-search .icon-search { font-size: 16px; color: #999a9b; }
+.filter-search input {
+  flex: 1;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: #E8EBF0;
+  font-family: 'Rubik', sans-serif;
+  font-size: 15px;
+  padding: 8px 0;
+  min-width: 0;
+}
+.filter-search input::placeholder { color: #6a6b6d; }
+.filter-sort {
+  background: rgba(227, 83, 83, .12);
+  border: 1px solid transparent;
+  color: #E35353;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: 'Rubik', sans-serif;
+  font-size: 13px;
+  transition: .25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-sort:hover { border-color: #E35353; }
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 30px;
+}
+.chip {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid #2c1a19;
+  background: #150d0d;
+  color: #cfd2d6;
+  cursor: pointer;
+  font-family: 'Rubik', sans-serif;
+  font-size: 14px;
+  transition: .25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.chip:hover { border-color: #E35353; color: #fff; }
+.chip.active {
+  background: linear-gradient(224.78deg, #E35353 8.12%, #B31313 92.21%);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(179, 19, 19, .35);
+}
+.chip .chip-count {
+  font-size: 12px;
+  background: rgba(255,255,255,.15);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.chip.active .chip-count { background: rgba(255,255,255,.22); }
+
+.results-meta {
+  color: #999a9b;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
