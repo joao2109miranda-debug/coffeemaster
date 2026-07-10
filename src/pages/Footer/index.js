@@ -17,7 +17,7 @@ const Footer = () => {
                         <div className="grid-3">
                             <h4>Fale conosco</h4>
                             <div className="flex-start-column mt-2">
-                                <Link to="/contact" className="color-gray link-footer">email@email.com.br</Link>
+                                <Link to="/contact" className="color-gray link-footer">contato@coffeemaster.com.br</Link>
                                 <Link to="/contact" className="color-gray link-footer">Canal de Suporte</Link>
                             </div>
                             

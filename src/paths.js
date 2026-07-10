@@ -5,6 +5,7 @@ import Login from 'pages/Login'
 import NotFound from 'pages/NotFound'
 import Posts from 'pages/Posts'
 import Products from 'pages/Products'
+import ProductAdmin from 'pages/Products/ProductAdmin'
 import Profile from 'pages/Profile'
 import Home from 'pages/Home'
 import AllPosts from 'pages/Posts/AllPosts'
@@ -40,6 +41,12 @@ const Paths = () => {
                     } />
 
                 <Route path="/products" element={<Products />} />
+                <Route path="/products/admin"
+                    element={
+                        <PrivateRoute>
+                            <ProductAdmin />
+                        </PrivateRoute>
+                    } />
                 <Route path="/allposts" element={<AllPosts />} />
                 <Route path="/posts/:id" element={<Posts />} />
                 <Route path="/about" element={<About />} />
