@@ -4,7 +4,7 @@ import Footer from '../Footer';
 
 import IconFacebook from '../../svg/icon-facebook.svg';
 import IconInstagram from '../../svg/icon-instagram.svg';
-import IconTwitter from '../../svg/icon-twitter.svg';
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from 'config';
 
 const Contact = () => {
 
@@ -38,6 +38,13 @@ const Contact = () => {
 
               <h6 className="color-primary mt-4">E-mail</h6>
               <p>contato@coffeemaster.com.br</p>
+
+              <h6 className="color-primary mt-4">WhatsApp</h6>
+              <p>
+                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" className="link">
+                  {WHATSAPP_DISPLAY}
+                </a>
+              </p>
 
               <h6 className="color-primary mt-4">Redes sociais</h6>
               <div className="mt-2">

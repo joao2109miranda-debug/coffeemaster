@@ -3,6 +3,8 @@ import Logo from '../../svg/icon-logo.svg'
 // Link
 import { Link } from 'react-router-dom';
 
+import { WHATSAPP_NUMBER, WHATSAPP_DISPLAY } from 'config';
+
 
 const Footer = () => {
     return (
@@ -18,6 +20,7 @@ const Footer = () => {
                             <h4>Fale conosco</h4>
                             <div className="flex-start-column mt-2">
                                 <Link to="/contact" className="color-gray link-footer">contato@coffeemaster.com.br</Link>
+                                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" className="color-gray link-footer">WhatsApp: {WHATSAPP_DISPLAY}</a>
                                 <Link to="/contact" className="color-gray link-footer">Canal de Suporte</Link>
                             </div>
                             
