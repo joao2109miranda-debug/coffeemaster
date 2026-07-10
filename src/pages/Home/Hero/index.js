@@ -11,15 +11,9 @@ const Hero = () => {
   const carouselImages = [image01, image02, image03];
 
   return (
-    <>
-      <a href="" target="_blank" className="whatsapp-link">
-        <i className="fab fa-whatsapp mt-1"></i>
-      </a>
-
-      <section className="container-hero flex-center">
-        <Carousel images={carouselImages} />
-      </section>
-    </>
+    <section className="container-hero flex-center">
+      <Carousel images={carouselImages} />
+    </section>
   );
 };
 

@@ -1,183 +1,178 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Header from '../Header';
 import Footer from '../Footer';
-
 import Context from '../../pages/Context';
 import { useContext, useState, useEffect } from 'react';
 import supabase from '../../services/supabase';
 
 const Profile = () => {
-  // Usuário autenticado (sessão do Supabase)
   const { user } = useContext(Context);
 
-  const initialValuePost = {
-    date: "",
-    image_url: "",
-    category: "tecnologia",
-    title: "",
-    resume: "",
-    content: "",
-    duration: "5",
-    views: 10,
-    status: 1,
-  };
-
-  // Dados do perfil para exibição
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [username, setUsername] = useState('');
-  const [imgProfile, setImgProfile] = useState('');
-  const [form, setForm] = useState(initialValuePost);
+  const [profile, setProfile] = useState(null);
+  const [form, setForm] = useState({ name: '', surname: '', username: '', image_profile: '' });
+  const [file, setFile] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('name, surname, username, image_profile')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Erro ao buscar dados do usuário:', error);
-        return;
-      }
-      if (data) {
-        setName(data.name);
-        setSurname(data.surname);
-        setUsername(data.username);
-        setImgProfile(data.image_profile);
-      }
-    };
-
-    fetchUserData();
+    if (!user) return;
+    supabase
+      .from('profiles')
+      .select('name, surname, username, image_profile, is_admin')
+      .eq('id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (error) { console.error(error); return; }
+        setProfile(data);
+        setForm({
+          name: data.name || '',
+          surname: data.surname || '',
+          username: data.username || '',
+          image_profile: data.image_profile || '',
+        });
+      });
   }, [user]);
 
-  function onChange(event) {
-    const { value, name } = event.target;
+  const onChange = (e) => {
+    const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-  }
+  };
 
-  async function handlePost(ev) {
-    ev.preventDefault();
+  const uploadAvatar = async () => {
+    if (!file) return form.image_profile || null;
+    const ext = file.name.split('.').pop();
+    const path = `${user.id}/${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+    if (upErr) throw upErr;
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const saveProfile = async (e) => {
+    e.preventDefault();
+    setMsg('');
     setError('');
-
-    if (!user) {
-      setError('Você precisa estar logado para publicar.');
-      return;
+    setSaving(true);
+    try {
+      const imageUrl = await uploadAvatar();
+      const { error: upErr } = await supabase
+        .from('profiles')
+        .update({
+          name: form.name,
+          surname: form.surname,
+          username: form.username,
+          image_profile: imageUrl,
+        })
+        .eq('id', user.id);
+      if (upErr) throw upErr;
+      setProfile({ ...profile, ...form, image_profile: imageUrl });
+      setFile(null);
+      setEditing(false);
+      setMsg('Perfil atualizado!');
+    } catch (err) {
+      console.error('Erro ao salvar perfil:', err);
+      setError('Não foi possível salvar. ' + (err.message || ''));
+    } finally {
+      setSaving(false);
     }
+  };
 
-    const { data, error } = await supabase
-      .from('posts')
-      .insert({ ...form, user_id: user.id })
-      .select('id')
-      .single();
-
-    if (error) {
-      console.error('Erro ao adicionar o post:', error);
-      setError('Não foi possível publicar o post. Tente novamente.');
-      return;
-    }
-
-    navigate(`/posts/${data.id}`);
-  }
+  const avatar = (profile && profile.image_profile) || form.image_profile;
 
   return (
     <>
       <Header />
 
-      <section className="container-profile">
-        <div className="row">
-          <div className="grid-6">
-            <div className="flex-start-row">
-              <div className="profile-big">
-                <img src={imgProfile} className="profile-img" alt="" />
-              </div>
-              <div className="ml-2">
-                {name && surname && username ? (
-                  <>
-                    <h3 className="color-white">{name} {surname}</h3>
-                    <h6 className="color-gray">@{username}</h6>
-                  </>
-                ) : (
-                  <p>Carregando dados do usuário...</p>
-                )}
-              </div>
-            </div>
-            <p className="mt-3">
-              Olá, bom dia! Seja bem-vindo ao blog. Compartilhe conhecimento.
-            </p>
+      <div className="page-wrap">
+        {/* Cabeçalho do dashboard */}
+        <div className="dash-header">
+          <img className="dash-avatar" src={avatar} alt="" />
+          <div style={{ flex: 1 }}>
+            {profile ? (
+              <>
+                <h3 className="color-white" style={{ margin: 0 }}>{profile.name} {profile.surname}</h3>
+                <h6 className="color-gray">@{profile.username}{profile.is_admin ? ' · admin' : ''}</h6>
+              </>
+            ) : (
+              <p>Carregando perfil...</p>
+            )}
           </div>
+          <button type="button" className="btn-outline btn-sm" onClick={() => { setEditing(!editing); setMsg(''); setError(''); }}>
+            {editing ? 'Fechar' : 'Editar perfil'}
+          </button>
         </div>
-      </section>
 
-      <section className="container">
-        <form onSubmit={handlePost}>
-          <h3>Adicionar novo post</h3>
-          <p className="mt-2">Preencha os campos abaixo para adicionar um novo post ao blog.</p>
-          <div className="row p-0">
-            <div className="grid-3 p-0">
-              <label htmlFor="date"><h6 className="mb-1">Data</h6></label>
-              <input type="date" name="date" id="date" value={form.date} onChange={onChange} />
+        {msg ? <div className="card-success p-2 mt-2" style={{ maxWidth: 520 }}><h6 className="h7 color-green">{msg}</h6></div> : null}
+
+        {/* Formulário de edição */}
+        {editing && (
+          <form onSubmit={saveProfile} className="admin-form mt-3" style={{ maxWidth: 640 }}>
+            <div className="row p-0">
+              <div className="grid-6 p-0">
+                <label htmlFor="name"><h6 className="mb-1">Nome</h6></label>
+                <input type="text" id="name" name="name" value={form.name} onChange={onChange} />
+              </div>
+              <div className="grid-6 p-0">
+                <label htmlFor="surname"><h6 className="mb-1">Sobrenome</h6></label>
+                <input type="text" id="surname" name="surname" value={form.surname} onChange={onChange} />
+              </div>
             </div>
-            <div className="grid-3 p-0">
-              <label htmlFor="category"><h6 className="mb-1">Categoria</h6></label>
-              <select name="category" id="category" value={form.category} onChange={onChange}>
-                <option value="tecnologia">Tecnologia</option>
-                <option value="games">Games</option>
-                <option value="fotografia">Fotografia</option>
-                <option value="cinema">Cinema</option>
-              </select>
+            <div className="row p-0">
+              <div className="grid-12 p-0">
+                <label htmlFor="username"><h6 className="mb-1">@ (usuário)</h6></label>
+                <input type="text" id="username" name="username" value={form.username} onChange={onChange} />
+              </div>
             </div>
-            <div className="grid-6 p-0">
-              <label htmlFor="title"><h6 className="mb-1">Título</h6></label>
-              <input type="text" name="title" id="title" value={form.title} onChange={onChange} />
+            <div className="row p-0">
+              <div className="grid-6 p-0">
+                <h6 className="mb-1">Foto de perfil</h6>
+                <div className="file-field">
+                  <label className="file-btn" htmlFor="avatar"><span>📎 Escolher arquivo</span></label>
+                  <input type="file" id="avatar" accept="image/*" onChange={(e) => setFile(e.target.files[0] || null)} />
+                  <span className="file-name">{file ? file.name : 'Nenhum arquivo escolhido'}</span>
+                </div>
+              </div>
+              <div className="grid-6 p-0">
+                <label htmlFor="image_profile"><h6 className="mb-1">...ou colar URL</h6></label>
+                <input type="text" id="image_profile" name="image_profile" value={form.image_profile} onChange={onChange} placeholder="https://..." />
+              </div>
             </div>
-          </div>
-          <div className="row p-0">
-            <div className="grid-12 p-0">
-              <label htmlFor="resume"><h6 className="mb-1">Resumo do post</h6></label>
-              <input type="text" name="resume" id="resume" value={form.resume} onChange={onChange} />
+            {error ? <div className="card-danger p-2 mt-2"><h6 className="h7 color-red">{error}</h6></div> : null}
+            <div className="flex-end-row mt-3">
+              <button type="submit" className="btn" disabled={saving}>{saving ? 'Salvando...' : 'Salvar'}</button>
             </div>
-          </div>
-          <div className="row p-0">
-            <div className="grid-8 p-0">
-              <label htmlFor="image_url"><h6 className="mb-1">URL da imagem</h6></label>
-              <input type="text" name="image_url" id="image_url" value={form.image_url} onChange={onChange} />
-            </div>
-            <div className="grid-4 p-0">
-              <label htmlFor="duration"><h6 className="mb-1">Duração de leitura</h6></label>
-              <select name="duration" id="duration" value={form.duration} onChange={onChange}>
-                <option value="5">5 min.</option>
-                <option value="7">7 min.</option>
-                <option value="10">10 min.</option>
-                <option value="15">15 min.</option>
-              </select>
-            </div>
-          </div>
-          <div className="row p-0">
-            <div className="grid-12 p-0">
-              <label htmlFor="content"><h6 className="mb-1">Conteúdo</h6></label>
-              <textarea name="content" id="content" rows="8" value={form.content} onChange={onChange}></textarea>
-            </div>
-          </div>
-          {error ? (
-            <div className="card-danger p-2 mt-2">
-              <h6 className="h7 color-red">{error}</h6>
-            </div>
-          ) : null}
-          <div className="flex-end-row mr-2 mt-2">
-            <button type="submit" className="btn">Adicionar</button>
-          </div>
-        </form>
-      </section>
+          </form>
+        )}
+
+        {/* Cards de ação */}
+        <div className="dash-grid">
+          <Link to="/profile/posts" className="dash-card">
+            <span className="dash-ico">📝</span>
+            <h5>Gerenciar posts</h5>
+            <p className="color-gray">Publique novos artigos no blog.</p>
+          </Link>
+
+          {profile && profile.is_admin && (
+            <Link to="/profile/products" className="dash-card">
+              <span className="dash-ico">☕</span>
+              <h5>Gerenciar produtos</h5>
+              <p className="color-gray">Cadastre, edite e remova máquinas.</p>
+            </Link>
+          )}
+
+          <Link to="/profile/settings" className="dash-card">
+            <span className="dash-ico">⚙️</span>
+            <h5>Configurações</h5>
+            <p className="color-gray">Senha e exclusão de conta.</p>
+          </Link>
+        </div>
+      </div>
 
       <Footer />
     </>
   );
-}
+};
 
 export default Profile;

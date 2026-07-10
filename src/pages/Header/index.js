@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Context from 'pages/Context';
 import supabase from 'services/supabase';
@@ -6,49 +6,73 @@ import Logo from '../../svg/icon-logo.svg'
 
 const Header = () => {
   const { user } = useContext(Context);
-  const [nameUser, setNameUser] = useState('');
+  const [profile, setProfile] = useState({ name: '', image_profile: '' });
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
       supabase
         .from('profiles')
-        .select('name')
+        .select('name, image_profile')
         .eq('id', user.id)
         .single()
         .then(({ data, error }) => {
-          if (error) {
-            console.error('Erro ao buscar informações do usuário', error);
-            return;
-          }
-          if (data) setNameUser(data.name);
+          if (error) { console.error("Erro ao buscar informações do usuário", error); return; }
+          if (data) setProfile(data);
         });
     } else {
-      setNameUser('');
+      setProfile({ name: '', image_profile: '' });
     }
   }, [user]);
 
-  const handleLogout = async (event) => {
-    event.preventDefault();
+  // Fecha o menu ao clicar fora
+  useEffect(() => {
+    const onClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', onClick);
+    return () => document.removeEventListener('mousedown', onClick);
+  }, []);
+
+  const handleLogout = async () => {
+    setOpen(false);
     await supabase.auth.signOut();
     navigate('/');
   };
 
+  // Menu responsivo (hambúrguer)
   useEffect(() => {
     const bx = document.querySelector('.bx');
     const menuMobile = document.querySelector('.menu-mobile');
+    if (!bx || !menuMobile) return;
 
     const handleClick = () => {
       bx.classList.toggle('activebx');
       menuMobile.classList.toggle('showmenu');
     };
-
     bx.addEventListener('click', handleClick);
-
-    return () => {
-      bx.removeEventListener('click', handleClick);
-    };
+    return () => bx.removeEventListener('click', handleClick);
   }, []);
+
+  const userMenu = (
+    <div className="user-menu" ref={menuRef}>
+      <button type="button" className="user-menu-trigger" onClick={() => setOpen(!open)}>
+        <img className="user-avatar" src={profile.image_profile} alt="" />
+        <span className="user-name">{profile.name || 'Perfil'}</span>
+        <span className="caret">▾</span>
+      </button>
+      {open && (
+        <div className="user-dropdown">
+          <Link to="/profile" onClick={() => setOpen(false)}>👤 &nbsp;Meu perfil</Link>
+          <Link to="/profile/settings" onClick={() => setOpen(false)}>⚙️ &nbsp;Configurações</Link>
+          <div className="dd-sep" />
+          <button type="button" className="dd-danger" onClick={handleLogout}>↪ &nbsp;Sair</button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -67,24 +91,11 @@ const Header = () => {
         <div className="flex-start-row">
           <div className="bx"></div>
           {!user ? (
-            <>
-              <div className="cta-desktop ml-3">
-                <Link to="/login" className="btn">Acessar</Link>
-              </div>
-            </>
+            <div className="cta-desktop ml-3">
+              <Link to="/login" className="btn">Acessar</Link>
+            </div>
           ) : (
-            <>
-              <div className="cta-desktop ml-3">
-                <Link to="/profile" className="link">{nameUser}</Link>
-                <span> &nbsp; | &nbsp;</span>
-                <a href="#" onClick={handleLogout} className="link">Sair</a>
-              </div>
-              <div className="cta-mobile mr-1">
-                <Link to="/profile" className="link acesso">{nameUser}</Link>
-                <span> &nbsp; | &nbsp;</span>
-                <a href="#" onClick={handleLogout} className="link">Sair</a>
-              </div>
-            </>
+            <div className="ml-3">{userMenu}</div>
           )}
         </div>
       </header>
@@ -96,8 +107,15 @@ const Header = () => {
             <li><Link to="/products" className="link-menu-mobile">Produtos</Link></li>
             <li><Link to="/allposts" className="link-menu-mobile">Blog</Link></li>
             <li><Link to="/contact" className="link-menu-mobile">Contato</Link></li>
-            <li><Link to="/login" className="link-menu-mobile acess">Acessar</Link></li>
-
+            {!user ? (
+              <li><Link to="/login" className="link-menu-mobile acess">Acessar</Link></li>
+            ) : (
+              <>
+                <li><Link to="/profile" className="link-menu-mobile">Meu perfil</Link></li>
+                <li><Link to="/profile/settings" className="link-menu-mobile">Configurações</Link></li>
+                <li><a href="#" className="link-menu-mobile acess" onClick={handleLogout}>Sair</a></li>
+              </>
+            )}
           </ul>
         </div>
       </div>

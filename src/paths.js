@@ -7,6 +7,8 @@ import Posts from 'pages/Posts'
 import Products from 'pages/Products'
 import ProductAdmin from 'pages/Products/ProductAdmin'
 import Profile from 'pages/Profile'
+import ProfilePosts from 'pages/Profile/ProfilePosts'
+import ProfileSettings from 'pages/Profile/ProfileSettings'
 import Home from 'pages/Home'
 import AllPosts from 'pages/Posts/AllPosts'
 
@@ -34,19 +36,17 @@ const Paths = () => {
                 <Route path="/login" element={<Login />} />
 
                 <Route path="/profile"
-                    element={
-                        <PrivateRoute>
-                            <Profile />
-                        </PrivateRoute>
-                    } />
+                    element={<PrivateRoute><Profile /></PrivateRoute>} />
+                <Route path="/profile/posts"
+                    element={<PrivateRoute><ProfilePosts /></PrivateRoute>} />
+                <Route path="/profile/products"
+                    element={<PrivateRoute><ProductAdmin /></PrivateRoute>} />
+                <Route path="/profile/settings"
+                    element={<PrivateRoute><ProfileSettings /></PrivateRoute>} />
 
                 <Route path="/products" element={<Products />} />
-                <Route path="/products/admin"
-                    element={
-                        <PrivateRoute>
-                            <ProductAdmin />
-                        </PrivateRoute>
-                    } />
+                {/* Rota antiga -> redireciona para a nova localização */}
+                <Route path="/products/admin" element={<Navigate to="/profile/products" replace />} />
                 <Route path="/allposts" element={<AllPosts />} />
                 <Route path="/posts/:id" element={<Posts />} />
                 <Route path="/about" element={<About />} />

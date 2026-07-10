@@ -16,7 +16,7 @@ const emptyForm = {
 
 const ProductAdmin = () => {
   const { user } = useContext(Context);
-  const [isAdmin, setIsAdmin] = useState(null); // null = verificando
+  const [isAdmin, setIsAdmin] = useState(null);
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [file, setFile] = useState(null);
@@ -24,7 +24,6 @@ const ProductAdmin = () => {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
 
-  // Verifica permissão de admin
   useEffect(() => {
     if (!user) {
       setIsAdmin(false);
@@ -52,8 +51,8 @@ const ProductAdmin = () => {
   }, [isAdmin, loadProducts]);
 
   const onChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   };
 
   const resetForm = () => {
@@ -144,7 +143,7 @@ const ProductAdmin = () => {
     return (
       <>
         <Header />
-        <section className="container"><p>Verificando permissão...</p></section>
+        <div className="page-wrap"><p>Verificando permissão...</p></div>
         <Footer />
       </>
     );
@@ -154,11 +153,11 @@ const ProductAdmin = () => {
     return (
       <>
         <Header />
-        <section className="container">
+        <div className="page-wrap">
           <h3>Acesso restrito</h3>
           <p className="mt-2">Você não tem permissão para gerenciar produtos.</p>
-          <Link to="/products" className="btn mt-3">Voltar para produtos</Link>
-        </section>
+          <Link to="/profile" className="btn-outline mt-3" style={{ display: "inline-block" }}>Voltar ao perfil</Link>
+        </div>
         <Footer />
       </>
     );
@@ -168,13 +167,16 @@ const ProductAdmin = () => {
     <>
       <Header />
 
-      <section className="container">
-        <div className="flex-space">
-          <h3>{form.id ? "Editar produto" : "Novo produto"}</h3>
-          <Link to="/products" className="link">Ver página pública</Link>
+      <div className="page-wrap">
+        <div className="page-head flex-space" style={{ alignItems: "center" }}>
+          <div>
+            <h6 className="uppercase color-primary">GERENCIAR PRODUTOS</h6>
+            <h3>{form.id ? "Editar produto" : "Novo produto"}</h3>
+          </div>
+          <Link to="/products" className="link">Ver página pública →</Link>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-2">
+        <form onSubmit={handleSubmit} className="admin-form">
           <div className="row p-0">
             <div className="grid-8 p-0">
               <label htmlFor="name"><h6 className="mb-1">Nome (Título)</h6></label>
@@ -210,8 +212,14 @@ const ProductAdmin = () => {
 
           <div className="row p-0">
             <div className="grid-6 p-0">
-              <label htmlFor="file"><h6 className="mb-1">Anexar imagem</h6></label>
-              <input type="file" id="file" accept="image/*" onChange={(e) => setFile(e.target.files[0] || null)} />
+              <h6 className="mb-1">Anexar imagem</h6>
+              <div className="file-field">
+                <label className="file-btn" htmlFor="file">
+                  <span>📎 Escolher arquivo</span>
+                </label>
+                <input type="file" id="file" accept="image/*" onChange={(e) => setFile(e.target.files[0] || null)} />
+                <span className="file-name">{file ? file.name : "Nenhum arquivo escolhido"}</span>
+              </div>
             </div>
             <div className="grid-6 p-0">
               <label htmlFor="image_url"><h6 className="mb-1">...ou colar URL da imagem</h6></label>
@@ -222,41 +230,39 @@ const ProductAdmin = () => {
           {error ? <div className="card-danger p-2 mt-2"><h6 className="h7 color-red">{error}</h6></div> : null}
           {msg ? <div className="card-success p-2 mt-2"><h6 className="h7 color-green">{msg}</h6></div> : null}
 
-          <div className="flex-end-row mt-3">
+          <div className="flex-end-row mt-3" style={{ alignItems: "center", gap: "16px" }}>
             {form.id ? (
-              <button type="button" className="link mr-3" onClick={resetForm}>Cancelar edição</button>
+              <button type="button" className="link-btn" onClick={resetForm} style={{ color: "#999a9b" }}>Cancelar edição</button>
             ) : null}
             <button type="submit" className="btn" disabled={saving}>
               {saving ? "Salvando..." : form.id ? "Salvar alterações" : "Criar produto"}
             </button>
           </div>
         </form>
-      </section>
 
-      <section className="container mt-4">
-        <h3 className="mb-2">Produtos cadastrados ({products.length})</h3>
+        <h3 className="mb-2 mt-4">Produtos cadastrados ({products.length})</h3>
         {products.length === 0 ? (
           <p>Nenhum produto ainda.</p>
         ) : (
           products.map((p) => (
-            <div key={p.id} className="card p-2 mb-2 flex-space">
-              <div className="flex-start-row">
-                {p.image_url ? <img src={p.image_url} alt="" style={{ width: 64, height: 64, objectFit: "cover", borderRadius: 8, marginRight: 12 }} /> : null}
+            <div key={p.id} className="manage-row">
+              <div className="m-left">
+                {p.image_url ? <img src={p.image_url} alt="" className="m-thumb" /> : null}
                 <div>
-                  <h5>{p.name}</h5>
-                  <h6 className={p.available ? "color-1" : "color-gray"}>
+                  <h5 style={{ margin: 0 }}>{p.name}</h5>
+                  <span className={p.available ? "avail-badge avail-on" : "avail-badge avail-off"}>
                     {p.available ? "Disponível" : "Indisponível"}
-                  </h6>
+                  </span>
                 </div>
               </div>
-              <div className="flex-start-row">
-                <button type="button" className="link mr-3" onClick={() => editProduct(p)}>Editar</button>
-                <button type="button" className="link color-red" onClick={() => handleDelete(p)}>Excluir</button>
+              <div className="m-actions">
+                <button type="button" className="btn-outline btn-sm" onClick={() => editProduct(p)}>Editar</button>
+                <button type="button" className="btn-danger btn-sm" onClick={() => handleDelete(p)}>Excluir</button>
               </div>
             </div>
           ))
         )}
-      </section>
+      </div>
 
       <Footer />
     </>

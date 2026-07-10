@@ -19,14 +19,14 @@ const Carousel = ({ images }) => {
 
   useEffect(() => {
     const box = document.querySelector(".carr-container");
+    if (!box) return;
 
     box.classList.add('fade-out');
 
     setTimeout(() => {
-      // Atualiza a imagem
-      box.style.transform = `translateX(${-contador * 1216}px)`;
+      // Cada slide ocupa 100vw — movemos por múltiplos de 100vw (responsivo)
+      box.style.transform = `translateX(${-contador * 100}vw)`;
 
-      // Remove a classe 'fade-out' após um pequeno intervalo
       setTimeout(() => {
         box.classList.remove('fade-out');
       }, 500);
@@ -44,11 +44,13 @@ const Carousel = ({ images }) => {
         </div>
       </div>
 
-      <h1 className="h0-hero">CoffeeMaster</h1>
-      <p className="p-hero">
-        O seu negócio com as melhores <br></br>máquinas de café.
-      </p>
-      <Link to="/products" className="btn-hero">Conheça nossos produtos</Link>
+      <div className="hero-overlay">
+        <h1 className="h0-hero">CoffeeMaster</h1>
+        <p className="p-hero">
+          O seu negócio com as melhores <br></br>máquinas de café.
+        </p>
+        <Link to="/products" className="btn-hero">Conheça nossos produtos</Link>
+      </div>
     </div>
   );
 };

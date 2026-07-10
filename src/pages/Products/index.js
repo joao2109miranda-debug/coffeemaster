@@ -43,31 +43,24 @@ const Products = () => {
     <>
       <Header />
 
-      <div className="container-products-page">
-        <div className="row">
-          <h6 className="uppercase color-primary text-center">PRODUTOS</h6>
-          <h3 className="text-center">Os melhores produtos para os melhores negócios.</h3>
+      <div className="page-wrap">
+        <div className="page-head flex-space" style={{ alignItems: "flex-end" }}>
+          <div>
+            <h6 className="uppercase color-primary">PRODUTOS</h6>
+            <h3>Os melhores produtos para os melhores negócios.</h3>
+          </div>
+          {isAdmin && (
+            <Link to="/profile/products" className="btn-outline btn-sm">Gerenciar produtos</Link>
+          )}
         </div>
 
-        {isAdmin && (
-          <div className="row flex-center">
-            <Link to="/products/admin" className="btn">Gerenciar produtos</Link>
-          </div>
+        {loading ? (
+          <p className="text-center">Carregando produtos...</p>
+        ) : products.length === 0 ? (
+          <p className="text-center">Nenhum produto cadastrado ainda.</p>
+        ) : (
+          products.map((product) => <ProductCard key={product.id} product={product} />)
         )}
-
-        <div className="container-svc-main">
-          <div className="tab-content active">
-            {loading ? (
-              <p className="text-center">Carregando produtos...</p>
-            ) : products.length === 0 ? (
-              <p className="text-center">Nenhum produto cadastrado ainda.</p>
-            ) : (
-              products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))
-            )}
-          </div>
-        </div>
       </div>
 
       <Footer />
