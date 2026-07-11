@@ -62,7 +62,7 @@ const Footer = () => {
 
                     <div className="row">
                         <div className="grid-9">
-                            <p>2026 | Todos os direitos reservados. Projeto desenvolvido por <a href="https://w.app/digiconnecta" target="_blank">Digiconnecta.</a> </p>
+                            <p>2026 | Todos os direitos reservados. Projeto desenvolvido por <a href="https://w.app/digiconnecta" target="_blank" rel="noopener noreferrer">Digiconnecta.</a> </p>
                         </div>
 
                         <div className="grid-3">

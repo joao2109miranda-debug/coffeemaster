@@ -39,7 +39,7 @@ const Carousel = ({ images }) => {
         <div className="carr-container">
           <div className="overlay"></div>
           {images.map((image, index) => (
-            <img key={index} src={image} className="img-hero pagelimit" alt={`Carousel Image ${index + 1}`} />
+            <img key={index} src={image} className="img-hero pagelimit" alt={`Slide ${index + 1} do CoffeeMaster`} />
           ))}
         </div>
       </div>

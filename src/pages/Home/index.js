@@ -81,12 +81,12 @@ const Home = () => {
                         <div className="grid-6 br-pd">
                             <div className="products-box">
                                 <div className="products-name">
-                                    <a href="" className="link-title">
+                                    <Link to="/products" className="link-title">
                                         <h5>ITALIAN COFFEE CIMBALI M24 SELECT</h5>
-                                    </a>
+                                    </Link>
                                     <h6>Disponível para locação e venda</h6>
                                     <div className="spacing-btn">
-                                        <a href="" className="btn-prod">Consultar</a>
+                                        <Link to="/contact" className="btn-prod">Consultar</Link>
                                     </div>
                                 </div>
                             </div>
@@ -94,12 +94,12 @@ const Home = () => {
                         <div className="grid-6">
                             <div className="products-box">
                                 <div className="products-name">
-                                    <a href="" className="link-title">
+                                    <Link to="/products" className="link-title">
                                         <h5>ITALIAN COFFEE ELITE</h5>
-                                    </a>
+                                    </Link>
                                     <h6>Disponível para locação e venda</h6>
                                     <div className="spacing-btn">
-                                        <a href="" className="btn-prod">Consultar</a>
+                                        <Link to="/contact" className="btn-prod">Consultar</Link>
                                     </div>
                                 </div>
                             </div>
@@ -107,12 +107,12 @@ const Home = () => {
                         <div className="grid-6">
                             <div className="products-box">
                                 <div className="products-name">
-                                    <a href="" className="link-title">
+                                    <Link to="/products" className="link-title">
                                         <h5>JURA IMPRESSA XF50</h5>
-                                    </a>
+                                    </Link>
                                     <h6>Disponível para locação</h6>
                                     <div className="spacing-btn">
-                                        <a href="" className="btn-prod">Consultar</a>
+                                        <Link to="/contact" className="btn-prod">Consultar</Link>
                                     </div>
                                 </div>
                             </div>
@@ -120,12 +120,12 @@ const Home = () => {
                         <div className="grid-6">
                             <div className="products-box">
                                 <div className="products-name">
-                                    <a href="" className="link-title">
+                                    <Link to="/products" className="link-title">
                                         <h5>JURA IMPRESSA XS90 OTC</h5>
-                                    </a>
+                                    </Link>
                                     <h6>Disponível para venda</h6>
                                     <div className="spacing-btn">
-                                        <a href="" className="btn-prod">Consultar</a>
+                                        <Link to="/contact" className="btn-prod">Consultar</Link>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@ const Home = () => {
                     </div>
 
                     <div className="more-products">
-                        <a href="" className="link">Veja mais produtos</a>
+                        <Link to="/products" className="link">Veja mais produtos</Link>
                     </div>
 
                 </section>
