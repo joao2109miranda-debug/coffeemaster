@@ -31,7 +31,7 @@ const Metadata = ({ date, category }) => (
 
 const Card = ({ content, variant = 'grid' }) => {
   const author = content.profiles || {};
-  const postUrl = `/posts/${content.id}`;
+  const postUrl = `/posts/${content.slug || content.id}`;
   const className = `blog-post-card blog-post-card--${variant}`;
   const category = content.post_categories?.name || content.category;
 

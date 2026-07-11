@@ -59,7 +59,7 @@ const Paths = () => {
                 {/* Rota antiga -> redireciona para a nova localização */}
                 <Route path="/products/admin" element={<Navigate to="/profile/products" replace />} />
                 <Route path="/allposts" element={<AllPosts />} />
-                <Route path="/posts/:id" element={<Posts />} />
+                <Route path="/posts/:slug" element={<Posts />} />
                 <Route path="/about" element={<About />} />
 
                 <Route path="*" element={<NotFound />} />

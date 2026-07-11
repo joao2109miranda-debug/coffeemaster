@@ -4,6 +4,16 @@ import Footer from 'pages/Footer';
 import Context from 'pages/Context';
 import { useContext, useState, useEffect, useCallback } from 'react';
 import supabase from 'services/supabase';
+import RichTextEditor from 'components/RichTextEditor';
+import { sanitizeHtml } from 'utils/sanitize';
+
+const slugify = (s) =>
+  (s || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 
 const emptyForm = {
   id: null,
@@ -27,6 +37,7 @@ const ProfilePosts = () => {
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
   const [saving, setSaving] = useState(false);
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     if (!user) return;
@@ -50,7 +61,7 @@ const ProfilePosts = () => {
     if (!user) return;
     let query = supabase
       .from('posts')
-      .select('id, user_id, title, category, category_id, date, image_url, resume, views, created_at, is_featured, profiles(name, surname, username)')
+      .select('id, user_id, title, slug, category, category_id, date, image_url, resume, views, created_at, is_featured, profiles(name, surname, username)')
       .order('created_at', { ascending: false });
     if (!isAdmin) query = query.eq('user_id', user.id);
     const { data, error: postsError } = await query;
@@ -66,7 +77,26 @@ const ProfilePosts = () => {
     setForm((current) => ({ ...current, [name]: value }));
   };
 
-  const resetForm = () => setForm(emptyForm);
+  const resetForm = () => { setForm(emptyForm); setFile(null); };
+
+  const uploadImage = async () => {
+    const ext = file.name.split('.').pop();
+    const path = `${user.id}/${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from('post-images').upload(path, file, { upsert: true });
+    if (upErr) throw upErr;
+    return supabase.storage.from('post-images').getPublicUrl(path).data.publicUrl;
+  };
+
+  const ensureUniqueSlug = async (base) => {
+    const root = base || 'post';
+    for (let n = 1; n <= 50; n++) {
+      const candidate = n === 1 ? root : `${root}-${n}`;
+      // eslint-disable-next-line no-await-in-loop
+      const { data } = await supabase.from('posts').select('id').eq('slug', candidate).limit(1);
+      if (!data || data.length === 0) return candidate;
+    }
+    return `${root}-${Date.now()}`;
+  };
 
   const editPost = async (post) => {
     const { data, error: postError } = await supabase.from('posts').select('*').eq('id', post.id).single();
@@ -83,6 +113,7 @@ const ProfilePosts = () => {
       views: data.views || 10,
       status: data.status ?? 1,
     });
+    setFile(null);
     setMsg('');
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -115,14 +146,15 @@ const ProfilePosts = () => {
     setSaving(true);
     try {
       const category = await resolveCategory();
+      const imageUrl = file ? await uploadImage() : form.image_url;
       const payload = {
         date: form.date || null,
-        image_url: form.image_url,
+        image_url: imageUrl,
         category: category.name,
         category_id: category.id,
         title: form.title.trim(),
         resume: form.resume,
-        content: form.content,
+        content: sanitizeHtml(form.content),
         duration: form.duration,
         views: Number(form.views) || 0,
         status: Number(form.status) || 1,
@@ -130,9 +162,11 @@ const ProfilePosts = () => {
 
       let resultError;
       if (form.id) {
+        // Mantém o slug estável ao editar (não quebra links existentes)
         ({ error: resultError } = await supabase.from('posts').update(payload).eq('id', form.id));
       } else {
-        ({ error: resultError } = await supabase.from('posts').insert({ ...payload, user_id: user.id }));
+        const slug = await ensureUniqueSlug(slugify(form.title));
+        ({ error: resultError } = await supabase.from('posts').insert({ ...payload, user_id: user.id, slug }));
       }
       if (resultError) throw resultError;
 
@@ -201,8 +235,16 @@ const ProfilePosts = () => {
             <input type="text" name="resume" id="resume" value={form.resume} onChange={onChange} />
           </div></div>
           <div className="row p-0">
-            <div className="grid-8 p-0">
-              <label htmlFor="image_url"><h6 className="mb-1">URL da imagem</h6></label>
+            <div className="grid-4 p-0">
+              <h6 className="mb-1">Anexar imagem</h6>
+              <div className="file-field">
+                <label className="file-btn" htmlFor="post-file"><span>📎 Escolher arquivo</span></label>
+                <input type="file" id="post-file" accept="image/*" onChange={(e) => setFile(e.target.files[0] || null)} />
+                <span className="file-name">{file ? file.name : 'Nenhum arquivo escolhido'}</span>
+              </div>
+            </div>
+            <div className="grid-4 p-0">
+              <label htmlFor="image_url"><h6 className="mb-1">...ou colar URL</h6></label>
               <input type="text" name="image_url" id="image_url" value={form.image_url} onChange={onChange} placeholder="https://..." />
             </div>
             <div className="grid-4 p-0">
@@ -213,8 +255,8 @@ const ProfilePosts = () => {
             </div>
           </div>
           <div className="row p-0"><div className="grid-12 p-0">
-            <label htmlFor="content"><h6 className="mb-1">Conteúdo</h6></label>
-            <textarea name="content" id="content" rows="8" value={form.content} onChange={onChange} />
+            <h6 className="mb-1">Conteúdo</h6>
+            <RichTextEditor value={form.content} onChange={(html) => setForm((c) => ({ ...c, content: html }))} placeholder="Escreva o conteúdo do post..." />
           </div></div>
 
           {error ? <div className="card-danger p-2 mt-2"><h6 className="h7 color-red">{error}</h6></div> : null}
@@ -237,7 +279,7 @@ const ProfilePosts = () => {
             </div>
             <div className="m-actions">
               {isAdmin ? <button type="button" className={`featured-toggle ${post.is_featured ? 'active' : ''}`} onClick={() => setFeatured(post)} title={post.is_featured ? 'Post em destaque' : 'Definir como destaque'} aria-label={post.is_featured ? 'Post em destaque' : 'Definir como destaque'}>★</button> : null}
-              <Link to={`/posts/${post.id}`} className="btn-outline btn-sm">Ver</Link>
+              <Link to={`/posts/${post.slug || post.id}`} className="btn-outline btn-sm">Ver</Link>
               <button type="button" className="btn-outline btn-sm" onClick={() => editPost(post)}>Editar</button>
               <button type="button" className="btn-danger btn-sm" onClick={() => handleDelete(post)}>Excluir</button>
             </div>

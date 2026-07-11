@@ -2,117 +2,98 @@
 import Header from "pages/Header";
 import Footer from "pages/Footer";
 
-// useParams
 import { useParams } from "react-router-dom";
-
-// Hooks
 import { useState, useEffect } from "react";
-
-// Supabase
 import supabase from "../../services/supabase";
-
-// Componentes
-import StarRating from "./StarRating";
 import Comments from "./Comments";
-
+import { toSafeHtml } from "utils/sanitize";
 
 const Posts = () => {
-    const [posts, setPosts] = useState(null);
-    const [users, setUsers] = useState(null);
-    const { id } = useParams();
+  const [posts, setPosts] = useState(null);
+  const [users, setUsers] = useState(null);
+  const { slug } = useParams();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!id) return;
-            const { data, error } = await supabase
-                .from("posts")
-                .select("*, profiles(*)")
-                .eq("id", id)
-                .single();
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!slug) return;
+      const isNumeric = /^\d+$/.test(slug);
+      let query = supabase.from("posts").select("*, profiles(*)");
+      query = isNumeric ? query.eq("id", slug) : query.eq("slug", slug);
+      const { data, error } = await query.single();
 
-            if (error || !data) {
-                console.error("Erro ao buscar dados:", error);
-                setPosts({});
-                setUsers({});
-                return;
-            }
+      if (error || !data) {
+        console.error("Erro ao buscar dados:", error);
+        setPosts({});
+        setUsers({});
+        return;
+      }
+      setPosts(data);
+      setUsers(data.profiles || {});
+    };
+    fetchData();
+  }, [slug]);
 
-            setPosts(data);
-            setUsers(data.profiles || {});
-        };
+  if (posts === null || users === null) {
+    return <p>Carregando...</p>;
+  }
 
-        fetchData();
-    }, [id]);
+  return (
+    <>
+      <Header />
 
-    if (posts === null || users === null) {
-        return <p>Carregando...</p>;
-    }
+      <section className="container-post">
+        <h6 className="uppercase color-primary text-center">{posts.category}</h6>
+        <h3 className="text-center"> {posts.title} </h3>
 
-    return (
-        <>
-            <Header />
+        <div className="flex-center my-3">
+          <div className="profile">
+            <img src={users.image_profile} className="profile-img" alt="" />
+          </div>
+          <div className="ml-2">
+            <h6 className="color-primary">{users.name}</h6>
+            <h6 className="color-gray">{users.username}</h6>
+          </div>
+          <p className="ml-4">{posts.date} - {posts.duration} min read</p>
+        </div>
 
-            <section className="container-post">
-                <h6 className="uppercase color-primary text-center">{posts.category}</h6>
-                <h3 className="text-center"> {posts.title} </h3>
+        <div className="img-banner hidden">
+          <img src={posts.image_url} alt="" />
+        </div>
 
-                <div className="flex-center my-3">
-                    <div className="profile">
-                        <img src={users.image_profile} className="profile-img" alt="" />
-                    </div>
-                    <div className="ml-2">
-                        <h6 className="color-primary">{users.name}</h6>
-                        <h6 className="color-gray">{users.username}</h6>
-                    </div>
-                    <p className="ml-4">{posts.date} - {posts.duration} min read</p>
-                </div>
+        <div className="row my-3">
+          <h4>{posts.resume}</h4>
+          {/* Conteúdo rico sanitizado (proteção XSS) */}
+          <div
+            className="post-content mt-2"
+            dangerouslySetInnerHTML={{ __html: toSafeHtml(posts.content) }}
+          />
+        </div>
 
-                <div className="img-banner hidden">
-                    <img src={posts.image_url} alt="" />
-                </div>
+        {/* Assinatura do autor — bio alinhada à esquerda */}
+        <div className="row">
+          <div className="grid-3 disappear"></div>
+          <div className="grid-6 card author-card">
+            <div className="author-head">
+              <div className="profile-big">
+                <img src={users.image_profile} className="profile-img" alt="" />
+              </div>
+              <div>
+                <h6 className="color-primary">{users.name} {users.surname}</h6>
+                <h6 className="color-gray">{users.username}</h6>
+              </div>
+            </div>
+            <p className="mt-1">{users.description}</p>
+          </div>
+          <div className="grid-3 disappear"></div>
+        </div>
 
-                <div className="row my-3">
-                    <h4>{posts.resume}</h4>
-                    <p className="mt-1">
-                        {posts.content}
-                    </p>
-                </div>
+        {/* Comentários + avaliação por estrela (abaixo da label) */}
+        <Comments postId={posts.id} />
+      </section>
 
-                {/* Avaliação anônima por estrela */}
-                <div className="row">
-                    <StarRating postId={posts.id} />
-                </div>
-
-                <div className="row">
-                    <div className="grid-3 disappear"></div>
-                    <div className="grid-6 card">
-                        <div className="row">
-                            <div className="grid-3 flex-center pl-1">
-                                <div className="profile-big">
-                                    <img src={users.image_profile} className="profile-img" alt="" />
-                                </div>
-                            </div>
-                            <div className="grid-9">
-                                <h6 className="color-primary">{users.name} {users.surname}</h6>
-                                <h6 className="color-gray">{users.username}</h6>
-                                <p className="mt-1">
-                                    {users.description}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="grid-3 disappear"></div>
-                </div>
-
-                {/* Comentários anônimos */}
-                <Comments postId={posts.id} />
-
-            </section>
-
-            <Footer />
-
-        </>
-    );
+      <Footer />
+    </>
+  );
 };
 
 export default Posts;

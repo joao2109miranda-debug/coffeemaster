@@ -3629,3 +3629,111 @@ button.link-btn {
 }
 .services-fullscreen > .container-svc-main { padding: 24px 0; }
 .services-fullscreen > .container { padding: 20px 0 0; }
+
+/* ================================================================
+   EDITOR RICH-TEXT (RTE)
+   ================================================================ */
+.rte {
+  border: 1px solid #2a1917;
+  border-radius: 12px;
+  background: #140c0c;
+  overflow: hidden;
+}
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-bottom: 1px solid #2a1917;
+  background: #1a1010;
+}
+.rte-btn {
+  min-width: 34px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: #cfc7c3;
+  cursor: pointer;
+  font-family: 'Rubik', sans-serif;
+  font-size: 14px;
+  transition: .18s ease;
+}
+.rte-btn:hover { background: rgba(227, 83, 83, .14); border-color: #3a2422; color: #fff; }
+.rte-sep { width: 1px; height: 20px; background: #2c1a19; margin: 0 4px; }
+.rte-area {
+  min-height: 220px;
+  padding: 16px 18px;
+  color: #EDE7E2;
+  font-family: 'Rubik', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  outline: none;
+}
+.rte-area:empty:before {
+  content: attr(data-placeholder);
+  color: #6f6360;
+}
+.rte-area blockquote,
+.post-content blockquote {
+  border-left: 3px solid #E35353;
+  margin: 12px 0;
+  padding: 4px 16px;
+  color: #cfc7c3;
+  background: rgba(227, 83, 83, .06);
+}
+.rte-area hr,
+.post-content hr {
+  border: 0;
+  border-top: 1px solid #3a2422;
+  margin: 20px 0;
+}
+.rte-area ul, .rte-area ol,
+.post-content ul, .post-content ol { padding-left: 24px; margin: 10px 0; }
+.rte-area a, .post-content a { color: #E35353; text-decoration: underline; }
+
+/* Conteúdo renderizado do post */
+.post-content {
+  color: #b9b2ae;
+  font-family: 'Rubik', sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+}
+.post-content p { margin: 0 0 14px; }
+.post-content h3, .post-content h4 { color: #EDE7E2; margin: 18px 0 8px; }
+
+/* ================================================================
+   FOTOS DE PERFIL: tamanho fixo, sem achatar
+   ================================================================ */
+.profile, .profile-big {
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Assinatura do autor no post (bio alinhada à esquerda) */
+.author-card { text-align: left; }
+.author-card .author-head { display: flex; align-items: center; gap: 14px; }
+.author-card p { text-align: left; margin-top: 10px; }
+
+/* ================================================================
+   MODERAÇÃO DE COMENTÁRIOS
+   ================================================================ */
+.comment-item.is-hidden { opacity: .6; }
+.comment-mod { display: flex; gap: 8px; margin-top: 8px; }
+.comment-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(227, 83, 83, .14);
+  color: #e58a8a;
+  margin-left: 8px;
+}
