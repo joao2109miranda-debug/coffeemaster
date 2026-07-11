@@ -6,12 +6,10 @@
 alter table public.products
   add column if not exists brand text;
 
--- Restringe aos valores conhecidos (aceita null enquanto não classificado)
+-- Marcas são livres; os filtros da aplicação usam os valores cadastrados.
+-- Este comando também remove o constraint de instalações anteriores.
 alter table public.products
   drop constraint if exists products_brand_check;
-alter table public.products
-  add constraint products_brand_check
-  check (brand is null or brand in ('astoria', 'jura', 'bunn'));
 
 -- Backfill: os 2 produtos semeados são Astoria
 update public.products

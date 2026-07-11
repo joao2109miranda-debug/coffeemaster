@@ -18,12 +18,22 @@ import Context from 'pages/Context';
 import { useContext } from 'react';
 
 
+// Redireciona para /login se não estiver autenticado
 function PrivateRoute({ children }) {
   const { session, loading } = useContext(Context);
 
   if (loading) return null; // aguarda a sessão carregar antes de decidir
 
   return session ? children : <Navigate to="/login" />;
+}
+
+// Redireciona para /profile se já estiver autenticado (ex.: /login)
+function PublicOnlyRoute({ children }) {
+  const { session, loading } = useContext(Context);
+
+  if (loading) return null;
+
+  return session ? <Navigate to="/profile" replace /> : children;
 }
 
 
@@ -33,7 +43,8 @@ const Paths = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/login"
+                    element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
 
                 <Route path="/profile"
                     element={<PrivateRoute><Profile /></PrivateRoute>} />

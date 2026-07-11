@@ -8,7 +8,7 @@ import supabase from "services/supabase";
 const emptyForm = {
   id: null,
   name: "",
-  brand: "astoria",
+  brand: "",
   available: true,
   description: "",
   specification: "",
@@ -24,6 +24,10 @@ const ProductAdmin = () => {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+
+  const brands = [...new Set(
+    products.map((product) => product.brand?.trim()).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   useEffect(() => {
     if (!user) {
@@ -65,7 +69,7 @@ const ProductAdmin = () => {
     setForm({
       id: p.id,
       name: p.name || "",
-      brand: p.brand || "astoria",
+      brand: p.brand || "",
       available: !!p.available,
       description: p.description || "",
       specification: p.specification || "",
@@ -97,12 +101,16 @@ const ProductAdmin = () => {
       setError("O nome do produto é obrigatório.");
       return;
     }
+    if (!form.brand.trim()) {
+      setError("A marca do produto é obrigatória.");
+      return;
+    }
     setSaving(true);
     try {
       const imageUrl = await uploadIfNeeded();
       const payload = {
         name: form.name.trim(),
-        brand: form.brand,
+        brand: form.brand.trim(),
         available: form.available,
         description: form.description,
         specification: form.specification,
@@ -187,11 +195,21 @@ const ProductAdmin = () => {
             </div>
             <div className="grid-3 p-0">
               <label htmlFor="brand"><h6 className="mb-1">Marca</h6></label>
-              <select id="brand" name="brand" value={form.brand} onChange={onChange}>
-                <option value="astoria">Astoria</option>
-                <option value="jura">JURA</option>
-                <option value="bunn">Bunn</option>
-              </select>
+              <input
+                type="text"
+                id="brand"
+                name="brand"
+                list="product-brands"
+                value={form.brand}
+                onChange={onChange}
+                placeholder="Digite ou selecione"
+                required
+              />
+              <datalist id="product-brands">
+                {brands.map((existingBrand) => (
+                  <option key={existingBrand} value={existingBrand} />
+                ))}
+              </datalist>
             </div>
             <div className="grid-3 p-0">
               <label htmlFor="available"><h6 className="mb-1">Disponibilidade</h6></label>

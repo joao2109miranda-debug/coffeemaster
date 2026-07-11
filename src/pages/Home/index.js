@@ -24,23 +24,42 @@ import { Link } from 'react-router-dom';
 const Home = () => {
     
      // State variables
-     const [card, setCard] = useState([]);
+     const [featuredPost, setFeaturedPost] = useState(null);
+     const [recentPosts, setRecentPosts] = useState([]);
 
      // Faça isso quando o componente montar
      useEffect(() => {
-         // Últimos 3 posts, com o autor (profiles) embutido
-         supabase
-             .from('posts')
-             .select('*, profiles(name, surname, username, image_profile)')
-             .order('date', { ascending: false })
-             .limit(3)
-             .then(({ data, error }) => {
-                 if (error) {
-                     console.error('Erro ao buscar posts:', error);
-                     return;
-                 }
-                 setCard(data || []);
-             });
+         const loadBlog = async () => {
+             const postFields = '*, profiles(name, surname, username, image_profile)';
+             const { data: featured, error: featuredError } = await supabase
+                 .from('posts')
+                 .select(postFields)
+                 .eq('is_featured', true)
+                 .maybeSingle();
+
+             if (featuredError) {
+                 console.error('Erro ao buscar post em destaque:', featuredError);
+                 return;
+             }
+
+             let recentQuery = supabase
+                 .from('posts')
+                 .select(postFields)
+                 .order('date', { ascending: false })
+                 .order('created_at', { ascending: false })
+                 .limit(featured ? 3 : 4);
+             if (featured) recentQuery = recentQuery.neq('id', featured.id);
+
+             const { data: recent, error: recentError } = await recentQuery;
+             if (recentError) {
+                 console.error('Erro ao buscar posts recentes:', recentError);
+                 return;
+             }
+
+             setFeaturedPost(featured || recent[0] || null);
+             setRecentPosts(featured ? (recent || []) : (recent || []).slice(1));
+         };
+         loadBlog();
      }, [])
 
 
@@ -54,7 +73,7 @@ const Home = () => {
 
             <div className="bg-section">
                 <div className="container-prod">
-                    <img src="svg/icon-coffee.svg" className="prod-img ml-2" alt=""/><h3 className="ml-2">Produtos</h3>
+                    <img src="/icons/products.png" className="section-title-icon" alt=""/><h3 className="ml-2">Produtos</h3>
                 </div>
             
                 <section className="container">
@@ -122,8 +141,9 @@ const Home = () => {
 
 
 
+            <section className="services-fullscreen">
             <div className="container-svc">
-                <img src="svg/icon-layers.svg" className="svc-img ml-2" alt=""/><h3 className="ml-2">Serviços</h3>    
+                <img src="/icons/grid.png" className="section-title-icon" alt=""/><h3 className="ml-2">Serviços</h3>
             </div>
             <section className="container-svc-main flex-center">
                 <div className="row-svc flex-center">
@@ -161,26 +181,29 @@ const Home = () => {
                     <Link to="/contact" className="btn">Contratar</Link>
                 </div>
             </div>
+            </section>
 
 
 
             <div className="bg-section">
-                <section className="container">
-                    <div className="container-about">
-                        <img src="svg/icon-blog.svg" className="about-img ml-2" alt=""></img><h3 className="ml-2">Blog</h3>    
-                    </div>
-                    <div className="row-blog">
-
-                        {
-                            
-                        card.map(function(item) {
-                            return <Card key={item.id} content={item} />;
-                        })
-                        
-                        }
-                        
-            
-                    </div>
+                <div className="container-about blog-section-heading">
+                    <img src="/icons/hash.png" className="section-title-icon" alt=""/><h3 className="ml-2">Blog</h3>
+                </div>
+                <section className="container blog-home-section">
+                    {featuredPost ? (
+                        <>
+                            <h6 className="blog-featured-label">POST EM DESTAQUE</h6>
+                            <Card content={featuredPost} variant="featured" />
+                        </>
+                    ) : null}
+                    {recentPosts.length > 0 ? (
+                        <div className="blog-recent-section">
+                            <h4 className="mb-2">Mais recentes</h4>
+                            <div className="blog-post-grid">
+                                {recentPosts.map((item) => <Card key={item.id} content={item} variant="grid" />)}
+                            </div>
+                        </div>
+                    ) : null}
 
                     <div className="container flex-center">
                         <div>

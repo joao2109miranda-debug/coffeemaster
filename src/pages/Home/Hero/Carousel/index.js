@@ -34,7 +34,7 @@ const Carousel = ({ images }) => {
   }, [contador]);
 
   return (
-    <div className="grid-12 flex-center">
+    <div className="hero-carousel">
       <div className="carrousel">
         <div className="carr-container">
           <div className="overlay"></div>

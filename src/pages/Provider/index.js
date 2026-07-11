@@ -23,8 +23,13 @@ const Provider = ({ children }) => {
 
     const user = session?.user ?? null;
 
+    const signOut = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+    };
+
     return (
-        <Context.Provider value={{ session, user, loading }}>
+        <Context.Provider value={{ session, user, loading, signOut }}>
             {children}
         </Context.Provider>
     );

@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import Header from '../Header';
 import Footer from '../Footer';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import supabase from '../../services/supabase';
+import Context from 'pages/Context';
 import BlogLogo from '../../svg/icon-logo.svg';
 
 const initialState = {
@@ -12,11 +13,30 @@ const initialState = {
 
 
 const Login = () => {
+  const { session, loading: sessionLoading } = useContext(Context);
   const [form, setForm] = useState(initialState);
   const [danger, setDanger] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Se a sessão ainda está carregando, mostra loading
+  if (sessionLoading) {
+    return (
+      <>
+        <Header />
+        <section className="container-login">
+          <p className="text-center">Carregando...</p>
+        </section>
+        <Footer />
+      </>
+    );
+  }
+
+  // Se já está logado, redireciona (safety net — PublicOnlyRoute já cuida disso)
+  if (session) {
+    return <Navigate to="/profile" replace />;
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault();

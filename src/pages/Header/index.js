@@ -5,7 +5,7 @@ import supabase from 'services/supabase';
 import Logo from '../../svg/icon-logo.svg'
 
 const Header = () => {
-  const { user } = useContext(Context);
+  const { user, session, signOut } = useContext(Context);
   const [profile, setProfile] = useState({ name: '', image_profile: '' });
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
@@ -38,8 +38,12 @@ const Header = () => {
 
   const handleLogout = async () => {
     setOpen(false);
-    await supabase.auth.signOut();
-    navigate('/');
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Erro ao encerrar a sessão:', error);
+    }
   };
 
   // Menu responsivo (hambúrguer)
@@ -90,7 +94,7 @@ const Header = () => {
         </nav>
         <div className="flex-start-row">
           <div className="bx"></div>
-          {!user ? (
+          {!session ? (
             <div className="cta-desktop ml-3">
               <Link to="/login" className="btn">Acessar</Link>
             </div>
@@ -107,13 +111,13 @@ const Header = () => {
             <li><Link to="/products" className="link-menu-mobile">Produtos</Link></li>
             <li><Link to="/allposts" className="link-menu-mobile">Blog</Link></li>
             <li><Link to="/contact" className="link-menu-mobile">Contato</Link></li>
-            {!user ? (
+            {!session ? (
               <li><Link to="/login" className="link-menu-mobile acess">Acessar</Link></li>
             ) : (
               <>
                 <li><Link to="/profile" className="link-menu-mobile">Meu perfil</Link></li>
                 <li><Link to="/profile/settings" className="link-menu-mobile">Configurações</Link></li>
-                <li><a href="#" className="link-menu-mobile acess" onClick={handleLogout}>Sair</a></li>
+                <li><button type="button" className="link-menu-mobile acess" onClick={handleLogout} style={{background:'none',border:0,width:'100%',textAlign:'left',cursor:'pointer'}}>Sair</button></li>
               </>
             )}
           </ul>

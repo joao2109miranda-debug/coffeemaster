@@ -7,19 +7,15 @@ import { Link } from "react-router-dom";
 import Context from "pages/Context";
 import supabase from "services/supabase";
 import ProductCard from "./ProductCard";
-
-const BRANDS = [
-  { key: "all",     label: "Todos" },
-  { key: "astoria", label: "Astoria" },
-  { key: "jura",    label: "JURA" },
-  { key: "bunn",    label: "Bunn" },
-];
+import FilterToolbar from "components/Filters/FilterToolbar";
 
 const AVAIL = [
   { key: "any", label: "Todos" },
-  { key: "on",  label: "Disponíveis" },
+  { key: "on", label: "Disponíveis" },
   { key: "off", label: "Indisponíveis" },
 ];
+
+const prettyBrand = (key) => key.charAt(0).toUpperCase() + key.slice(1);
 
 const Products = () => {
   const { user } = useContext(Context);
@@ -30,7 +26,7 @@ const Products = () => {
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
   const [avail, setAvail] = useState("any");
-  const [sortDesc, setSortDesc] = useState(false); // false = mais antigos primeiro
+  const [sortDesc, setSortDesc] = useState(false);
 
   useEffect(() => {
     supabase
@@ -54,17 +50,27 @@ const Products = () => {
       .then(({ data }) => setIsAdmin(!!(data && data.is_admin)));
   }, [user]);
 
-  // Contagem por marca (para os chips)
   const countsByBrand = useMemo(() => {
-    const c = { all: products.length, astoria: 0, jura: 0, bunn: 0 };
-    products.forEach((p) => { if (p.brand && c[p.brand] !== undefined) c[p.brand]++; });
+    const c = { all: products.length };
+    products.forEach((p) => {
+      const b = p.brand?.trim();
+      if (b) c[b] = (c[b] || 0) + 1;
+    });
     return c;
   }, [products]);
+
+  const brandOptions = useMemo(() => [
+    { key: "all", label: "Todos", count: countsByBrand.all || 0 },
+    ...Object.keys(countsByBrand)
+      .filter((k) => k !== "all")
+      .sort((a, b) => a.localeCompare(b, "pt-BR"))
+      .map((k) => ({ key: k, label: prettyBrand(k), count: countsByBrand[k] || 0 })),
+  ], [countsByBrand]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = products.filter((p) => {
-      if (brand !== "all" && p.brand !== brand) return false;
+      if (brand !== "all" && p.brand?.trim() !== brand) return false;
       if (avail === "on" && !p.available) return false;
       if (avail === "off" && p.available) return false;
       if (q && !(`${p.name} ${p.description || ""} ${p.specification || ""}`.toLowerCase().includes(q))) return false;
@@ -83,7 +89,7 @@ const Products = () => {
       <Header />
 
       <div className="page-wrap">
-        <div className="page-head flex-space" style={{ alignItems: "flex-end" }}>
+        <div className="page-head flex-space">
           <div>
             <h6 className="uppercase color-primary">PRODUTOS</h6>
             <h3>Os melhores produtos para os melhores negócios.</h3>
@@ -93,59 +99,26 @@ const Products = () => {
           )}
         </div>
 
-        {/* Barra de busca */}
-        <div className="filter-bar">
-          <div className="filter-search">
-            <span className="icon-search">🔍</span>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar por nome, descrição ou especificação..."
-            />
-          </div>
-          <button type="button" className="filter-sort" onClick={() => setSortDesc((v) => !v)} title="Ordenar">
-            <span>⇅</span>
-            <span>{sortDesc ? "Mais recentes" : "Mais antigos"}</span>
-          </button>
-        </div>
-
-        {/* Chips de marca */}
-        <div className="chip-row" role="tablist" aria-label="Filtrar por marca">
-          {BRANDS.map((b) => (
-            <button
-              key={b.key}
-              type="button"
-              className={`chip ${brand === b.key ? "active" : ""}`}
-              onClick={() => setBrand(b.key)}
-              role="tab"
-              aria-selected={brand === b.key}
-            >
-              <span>{b.label}</span>
-              <span className="chip-count">{countsByBrand[b.key] || 0}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Chips de disponibilidade */}
-        <div className="chip-row" role="tablist" aria-label="Filtrar por disponibilidade">
-          {AVAIL.map((a) => (
-            <button
-              key={a.key}
-              type="button"
-              className={`chip ${avail === a.key ? "active" : ""}`}
-              onClick={() => setAvail(a.key)}
-              role="tab"
-              aria-selected={avail === a.key}
-            >
-              {a.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="results-meta">
-          {loading ? "Carregando..." : `${filtered.length} produto(s) encontrado(s)`}
-        </div>
+        <FilterToolbar
+          search={{
+            value: query,
+            onChange: setQuery,
+            placeholder: "Buscar por nome, descrição ou especificação...",
+          }}
+          inlineFilter={{
+            options: [
+              { key: "recent", label: "Recentes" },
+              { key: "old", label: "Antigos" },
+            ],
+            value: sortDesc ? "recent" : "old",
+            onChange: (k) => setSortDesc(k === "recent"),
+          }}
+          groups={[
+            { label: "Marca", options: brandOptions, value: brand, onChange: setBrand },
+            { label: "Disponibilidade", options: AVAIL, value: avail, onChange: setAvail },
+          ]}
+          meta={loading ? "Carregando..." : `${filtered.length} produto(s) encontrado(s)`}
+        />
 
         {!loading && filtered.length === 0 ? (
           <p className="text-center mt-3">Nenhum produto corresponde aos filtros.</p>
