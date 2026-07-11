@@ -8,12 +8,15 @@ import Context from "pages/Context";
 import supabase from "services/supabase";
 import ProductCard from "./ProductCard";
 import FilterToolbar from "components/Filters/FilterToolbar";
+import Pagination from "components/Pagination";
+import Skeleton from "components/Skeleton";
 
 const AVAIL = [
   { key: "any", label: "Todos" },
   { key: "on", label: "Disponíveis" },
   { key: "off", label: "Indisponíveis" },
 ];
+const PRODUCTS_PER_PAGE = 6;
 
 const prettyBrand = (key) => key.charAt(0).toUpperCase() + key.slice(1);
 
@@ -27,6 +30,7 @@ const Products = () => {
   const [brand, setBrand] = useState("all");
   const [avail, setAvail] = useState("any");
   const [sortDesc, setSortDesc] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     supabase
@@ -84,6 +88,10 @@ const Products = () => {
     return list;
   }, [products, query, brand, avail, sortDesc]);
 
+  useEffect(() => setPage(1), [query, brand, avail, sortDesc]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PRODUCTS_PER_PAGE));
+  const visibleProducts = filtered.slice((page - 1) * PRODUCTS_PER_PAGE, page * PRODUCTS_PER_PAGE);
+
   return (
     <>
       <Header />
@@ -120,11 +128,13 @@ const Products = () => {
           meta={loading ? "Carregando..." : `${filtered.length} produto(s) encontrado(s)`}
         />
 
+        {loading ? <Skeleton variant="row" count={3} /> : null}
         {!loading && filtered.length === 0 ? (
           <p className="text-center mt-3">Nenhum produto corresponde aos filtros.</p>
         ) : (
-          filtered.map((product) => <ProductCard key={product.id} product={product} />)
+          !loading && visibleProducts.map((product) => <ProductCard key={product.id} product={product} />)
         )}
+        {!loading ? <Pagination page={page} totalPages={totalPages} onChange={setPage} /> : null}
       </div>
 
       <Footer />

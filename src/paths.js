@@ -15,7 +15,8 @@ import AllPosts from 'pages/Posts/AllPosts'
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 
 import Context from 'pages/Context';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 
 // Redireciona para /login se não estiver autenticado
@@ -36,10 +37,21 @@ function PublicOnlyRoute({ children }) {
   return session ? <Navigate to="/profile" replace /> : children;
 }
 
+function ScrollToTop() {
+  const { pathname, search, hash } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [pathname, search, hash]);
+
+  return null;
+}
+
 
 const Paths = () => {
     return (
         <BrowserRouter>
+            <ScrollToTop />
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/contact" element={<Contact />} />

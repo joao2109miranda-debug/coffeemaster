@@ -11,6 +11,7 @@ const WhatsAppFloat = () => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Fale conosco no WhatsApp"
+      className="whatsapp-float"
       style={{
         position: 'fixed',
         right: '20px',

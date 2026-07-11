@@ -70,22 +70,26 @@ const Posts = () => {
         </div>
 
         {/* Assinatura do autor — bio alinhada à esquerda */}
+        <div className="post-divider" aria-hidden="true" />
+
         <div className="row">
-          <div className="grid-3 disappear"></div>
-          <div className="grid-6 card author-card">
-            <div className="author-head">
-              <div className="profile-big">
-                <img src={users.image_profile} className="profile-img" alt="" />
+          <div className="card author-card">
+            <div className="row">
+              <div className="grid-3 flex-center pl-1">
+                <div className="profile-big">
+                  <img src={users.image_profile} className="profile-img" alt="" />
+                </div>
               </div>
-              <div>
+              <div className="grid-9">
                 <h6 className="color-primary">{users.name} {users.surname}</h6>
                 <h6 className="color-gray">{users.username}</h6>
+                <p className="mt-1">{users.description}</p>
               </div>
             </div>
-            <p className="mt-1">{users.description}</p>
           </div>
-          <div className="grid-3 disappear"></div>
         </div>
+
+        <div className="post-divider" aria-hidden="true" />
 
         {/* Comentários + avaliação por estrela (abaixo da label) */}
         <Comments postId={posts.id} />

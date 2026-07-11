@@ -4,6 +4,12 @@ import Header from "pages/Header";
 import Footer from "pages/Footer";
 import Context from "pages/Context";
 import supabase from "services/supabase";
+import RichTextEditor from "components/RichTextEditor";
+import { sanitizeHtml } from "utils/sanitize";
+import Pagination from "components/Pagination";
+import Skeleton from "components/Skeleton";
+
+const ADMIN_PRODUCTS_PER_PAGE = 6;
 
 const emptyForm = {
   id: null,
@@ -24,6 +30,8 @@ const ProductAdmin = () => {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
+  const [listLoading, setListLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
   const brands = [...new Set(
     products.map((product) => product.brand?.trim()).filter(Boolean)
@@ -43,17 +51,22 @@ const ProductAdmin = () => {
   }, [user]);
 
   const loadProducts = useCallback(async () => {
+    setListLoading(true);
     const { data, error } = await supabase
       .from("products")
       .select("*")
       .order("created_at", { ascending: true });
     if (error) console.error("Erro ao buscar produtos:", error);
     else setProducts(data || []);
+    setListLoading(false);
   }, []);
 
   useEffect(() => {
     if (isAdmin) loadProducts();
   }, [isAdmin, loadProducts]);
+
+  const totalPages = Math.max(1, Math.ceil(products.length / ADMIN_PRODUCTS_PER_PAGE));
+  const visibleProducts = products.slice((page - 1) * ADMIN_PRODUCTS_PER_PAGE, page * ADMIN_PRODUCTS_PER_PAGE);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -112,8 +125,8 @@ const ProductAdmin = () => {
         name: form.name.trim(),
         brand: form.brand.trim(),
         available: form.available,
-        description: form.description,
-        specification: form.specification,
+        description: sanitizeHtml(form.description),
+        specification: sanitizeHtml(form.specification),
         image_url: imageUrl,
         updated_at: new Date().toISOString(),
       };
@@ -227,15 +240,15 @@ const ProductAdmin = () => {
 
           <div className="row p-0">
             <div className="grid-12 p-0">
-              <label htmlFor="description"><h6 className="mb-1">Descrição</h6></label>
-              <textarea id="description" name="description" rows="4" value={form.description} onChange={onChange} placeholder="Descreva a máquina..."></textarea>
+              <h6 className="mb-1">Descrição</h6>
+              <RichTextEditor compact value={form.description} onChange={(html) => setForm((current) => ({ ...current, description: html }))} placeholder="Descreva a máquina..." />
             </div>
           </div>
 
           <div className="row p-0">
             <div className="grid-12 p-0">
-              <label htmlFor="specification"><h6 className="mb-1">Especificação</h6></label>
-              <textarea id="specification" name="specification" rows="4" value={form.specification} onChange={onChange} placeholder="Ex.: - Entrada automática de água; // Lança de Vapor; // Voltagem: 220V"></textarea>
+              <h6 className="mb-1">Especificação</h6>
+              <RichTextEditor compact value={form.specification} onChange={(html) => setForm((current) => ({ ...current, specification: html }))} placeholder="Liste as especificações da máquina..." />
             </div>
           </div>
 
@@ -270,10 +283,10 @@ const ProductAdmin = () => {
         </form>
 
         <h3 className="mb-2 mt-4">Produtos cadastrados ({products.length})</h3>
-        {products.length === 0 ? (
+        {listLoading ? <Skeleton count={3} /> : products.length === 0 ? (
           <p>Nenhum produto ainda.</p>
         ) : (
-          products.map((p) => (
+          visibleProducts.map((p) => (
             <div key={p.id} className="manage-row">
               <div className="m-left">
                 {p.image_url ? <img src={p.image_url} alt="" className="m-thumb" /> : null}
@@ -291,6 +304,7 @@ const ProductAdmin = () => {
             </div>
           ))
         )}
+        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       </div>
 
       <Footer />

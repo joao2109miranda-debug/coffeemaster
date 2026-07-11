@@ -3,7 +3,6 @@
 import Header from "pages/Header";
 import Footer from "pages/Footer";
 
-import iconAbout from '../../svg/icon-about.svg';
 import bannerAbout from '../../img/img-about-banner.png'
 import person from '../../svg/person.svg'
 
@@ -12,8 +11,8 @@ const About = () => {
         <>
                 <Header />
 
-                <div className="container-about">
-                    <img src={iconAbout} className="about-img ml-2" alt="" /><h3 className="ml-2">Sobre nós</h3>    
+                <div className="page-wrap about-page-head">
+                    <div className="page-head"><h6 className="uppercase color-primary">SOBRE</h6><h3>Sobre nós</h3></div>
                 </div>
 
                 <section className="container">

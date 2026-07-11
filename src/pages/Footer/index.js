@@ -1,10 +1,26 @@
 import Logo from '../../svg/icon-logo.svg'
+import { useEffect, useState } from 'react';
+import supabase from 'services/supabase';
 
 // Link
 import { Link } from 'react-router-dom';
 
 
 const Footer = () => {
+    const [products, setProducts] = useState([]);
+
+    useEffect(() => {
+        supabase
+            .from('products')
+            .select('id, name')
+            .order('created_at', { ascending: false })
+            .limit(4)
+            .then(({ data, error }) => {
+                if (error) { console.error('Erro ao buscar produtos do rodapé:', error); return; }
+                setProducts(data || []);
+            });
+    }, []);
+
     return (
         <>
             <footer className="bg-section bt-black">
@@ -26,9 +42,9 @@ const Footer = () => {
                         <div className="grid-3">
                             <h4>Produtos</h4>
                             <div className="flex-start-column mt-2">
-                                <Link to="/products" className="color-gray link-footer">Astoria</Link>
-                                <Link to="/products" className="color-gray link-footer">JURA</Link>
-                                <Link to="/products" className="color-gray link-footer">Bunn</Link>
+                                {products.map((product) => (
+                                    <Link key={product.id} to="/products" className="color-gray link-footer">{product.name}</Link>
+                                ))}
                             </div>
                         </div>
 

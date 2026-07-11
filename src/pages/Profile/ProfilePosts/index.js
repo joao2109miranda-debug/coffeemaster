@@ -6,6 +6,10 @@ import { useContext, useState, useEffect, useCallback } from 'react';
 import supabase from 'services/supabase';
 import RichTextEditor from 'components/RichTextEditor';
 import { sanitizeHtml } from 'utils/sanitize';
+import Pagination from 'components/Pagination';
+import Skeleton from 'components/Skeleton';
+
+const ADMIN_POSTS_PER_PAGE = 6;
 
 const slugify = (s) =>
   (s || '')
@@ -38,6 +42,8 @@ const ProfilePosts = () => {
   const [msg, setMsg] = useState('');
   const [saving, setSaving] = useState(false);
   const [file, setFile] = useState(null);
+  const [listLoading, setListLoading] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +65,7 @@ const ProfilePosts = () => {
 
   const load = useCallback(async () => {
     if (!user) return;
+    setListLoading(true);
     let query = supabase
       .from('posts')
       .select('id, user_id, title, slug, category, category_id, date, image_url, resume, views, created_at, is_featured, profiles(name, surname, username)')
@@ -67,7 +74,11 @@ const ProfilePosts = () => {
     const { data, error: postsError } = await query;
     if (postsError) console.error(postsError);
     else setPosts(data || []);
+    setListLoading(false);
   }, [user, isAdmin]);
+
+  const totalPages = Math.max(1, Math.ceil(posts.length / ADMIN_POSTS_PER_PAGE));
+  const visiblePosts = posts.slice((page - 1) * ADMIN_POSTS_PER_PAGE, page * ADMIN_POSTS_PER_PAGE);
 
   useEffect(() => { loadCategories(); }, [loadCategories]);
   useEffect(() => { load(); }, [load]);
@@ -268,7 +279,7 @@ const ProfilePosts = () => {
         </form>
 
         <h3 className="mb-2 mt-4">{isAdmin ? 'Todos os posts' : 'Meus posts'} ({posts.length})</h3>
-        {posts.length === 0 ? <p>Nenhum post encontrado.</p> : posts.map((post) => (
+        {listLoading ? <Skeleton count={3} /> : posts.length === 0 ? <p>Nenhum post encontrado.</p> : visiblePosts.map((post) => (
           <div key={post.id} className="manage-row">
             <div className="m-left">
               {post.image_url ? <img src={post.image_url} alt="" className="m-thumb" /> : null}
@@ -285,6 +296,7 @@ const ProfilePosts = () => {
             </div>
           </div>
         ))}
+        <Pagination page={page} totalPages={totalPages} onChange={setPage} />
       </div>
       <Footer />
     </>

@@ -1,4 +1,5 @@
 import { WHATSAPP_NUMBER } from 'config';
+import { toSafeHtml } from 'utils/sanitize';
 
 const ProductCard = ({ product }) => {
   const handleWhats = () => {
@@ -30,10 +31,10 @@ const ProductCard = ({ product }) => {
           </span>
         </div>
 
-        <p className="mt-2 mb-1">{product.description}</p>
+        <div className="product-rich-text mt-2 mb-1" dangerouslySetInnerHTML={{ __html: toSafeHtml(product.description) }} />
 
         <h6 className="color-1 h7 link mt-2">Especificações</h6>
-        <p className="mt-1">{product.specification}</p>
+        <div className="product-rich-text mt-1" dangerouslySetInnerHTML={{ __html: toSafeHtml(product.specification) }} />
 
         <button className="btn mt-2 btn-click" onClick={handleWhats}>
           Verificar disponibilidade

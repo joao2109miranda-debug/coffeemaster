@@ -9,7 +9,7 @@ const Profile = () => {
   const { user } = useContext(Context);
 
   const [profile, setProfile] = useState(null);
-  const [form, setForm] = useState({ name: '', surname: '', username: '', image_profile: '' });
+  const [form, setForm] = useState({ name: '', surname: '', username: '', description: '', image_profile: '' });
   const [file, setFile] = useState(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -20,7 +20,7 @@ const Profile = () => {
     if (!user) return;
     supabase
       .from('profiles')
-      .select('name, surname, username, image_profile, is_admin')
+      .select('name, surname, username, description, image_profile, is_admin')
       .eq('id', user.id)
       .single()
       .then(({ data, error }) => {
@@ -30,6 +30,7 @@ const Profile = () => {
           name: data.name || '',
           surname: data.surname || '',
           username: data.username || '',
+          description: data.description || '',
           image_profile: data.image_profile || '',
         });
       });
@@ -63,6 +64,7 @@ const Profile = () => {
           name: form.name,
           surname: form.surname,
           username: form.username,
+          description: form.description,
           image_profile: imageUrl,
         })
         .eq('id', user.id);
@@ -93,7 +95,7 @@ const Profile = () => {
             {profile ? (
               <>
                 <h3 className="color-white" style={{ margin: 0 }}>{profile.name} {profile.surname}</h3>
-                <h6 className="color-gray">@{profile.username}{profile.is_admin ? ' · admin' : ''}</h6>
+                <h6 className="color-gray">@{profile.username}{profile.is_admin ? ' · Administrador da página' : ''}</h6>
               </>
             ) : (
               <p>Carregando perfil...</p>
@@ -108,36 +110,45 @@ const Profile = () => {
 
         {/* Formulário de edição */}
         {editing && (
-          <form onSubmit={saveProfile} className="admin-form mt-3" style={{ maxWidth: 640 }}>
-            <div className="row p-0">
-              <div className="grid-6 p-0">
-                <label htmlFor="name"><h6 className="mb-1">Nome</h6></label>
-                <input type="text" id="name" name="name" value={form.name} onChange={onChange} />
-              </div>
-              <div className="grid-6 p-0">
-                <label htmlFor="surname"><h6 className="mb-1">Sobrenome</h6></label>
-                <input type="text" id="surname" name="surname" value={form.surname} onChange={onChange} />
-              </div>
-            </div>
-            <div className="row p-0">
-              <div className="grid-12 p-0">
-                <label htmlFor="username"><h6 className="mb-1">@ (usuário)</h6></label>
-                <input type="text" id="username" name="username" value={form.username} onChange={onChange} />
-              </div>
-            </div>
-            <div className="row p-0">
-              <div className="grid-6 p-0">
-                <h6 className="mb-1">Foto de perfil</h6>
-                <div className="file-field">
-                  <label className="file-btn" htmlFor="avatar"><span>📎 Escolher arquivo</span></label>
-                  <input type="file" id="avatar" accept="image/*" onChange={(e) => setFile(e.target.files[0] || null)} />
-                  <span className="file-name">{file ? file.name : 'Nenhum arquivo escolhido'}</span>
+          <form onSubmit={saveProfile} className="admin-form profile-edit-form mt-3">
+            <div className="profile-edit-grid">
+              <section className="profile-edit-panel">
+                <h5>Dados do perfil</h5>
+                <div className="row p-0">
+                  <div className="grid-6 p-0">
+                    <label htmlFor="name"><h6 className="mb-1">Nome</h6></label>
+                    <input type="text" id="name" name="name" value={form.name} onChange={onChange} />
+                  </div>
+                  <div className="grid-6 p-0">
+                    <label htmlFor="surname"><h6 className="mb-1">Sobrenome</h6></label>
+                    <input type="text" id="surname" name="surname" value={form.surname} onChange={onChange} />
+                  </div>
                 </div>
-              </div>
-              <div className="grid-6 p-0">
-                <label htmlFor="image_profile"><h6 className="mb-1">...ou colar URL</h6></label>
-                <input type="text" id="image_profile" name="image_profile" value={form.image_profile} onChange={onChange} placeholder="https://..." />
-              </div>
+                <div className="row p-0"><div className="grid-12 p-0">
+                  <label htmlFor="username"><h6 className="mb-1">@ (usuário)</h6></label>
+                  <input type="text" id="username" name="username" value={form.username} onChange={onChange} />
+                </div></div>
+                <div className="row p-0">
+                  <div className="grid-6 p-0">
+                    <h6 className="mb-1">Foto de perfil</h6>
+                    <div className="file-field">
+                      <label className="file-btn" htmlFor="avatar"><span>📎 Escolher arquivo</span></label>
+                      <input type="file" id="avatar" accept="image/*" onChange={(e) => setFile(e.target.files[0] || null)} />
+                      <span className="file-name">{file ? file.name : 'Nenhum arquivo escolhido'}</span>
+                    </div>
+                  </div>
+                  <div className="grid-6 p-0">
+                    <label htmlFor="image_profile"><h6 className="mb-1">...ou colar URL</h6></label>
+                    <input type="text" id="image_profile" name="image_profile" value={form.image_profile} onChange={onChange} placeholder="https://..." />
+                  </div>
+                </div>
+              </section>
+              <section className="profile-edit-panel profile-signature-panel">
+                <h5>Assinatura do autor</h5>
+                <p className="color-gray">Exibida ao fim dos seus posts no blog.</p>
+                <label htmlFor="description"><h6 className="mb-1">Apresentação profissional</h6></label>
+                <textarea id="description" name="description" rows="8" value={form.description} onChange={onChange} placeholder="Ex.: Especialista em cafés especiais e cafeicultura." />
+              </section>
             </div>
             {error ? <div className="card-danger p-2 mt-2"><h6 className="h7 color-red">{error}</h6></div> : null}
             <div className="flex-end-row mt-3">
@@ -147,6 +158,7 @@ const Profile = () => {
         )}
 
         {/* Cards de ação */}
+        {editing ? <div className="profile-actions-divider" aria-hidden="true" /> : null}
         <div className="dash-grid">
           <Link to="/profile/posts" className="dash-card">
             <span className="dash-ico">📝</span>
