@@ -69,6 +69,7 @@ const ProfilePosts = () => {
     let query = supabase
       .from('posts')
       .select('id, user_id, title, slug, category, category_id, date, image_url, resume, views, created_at, is_featured, profiles(name, surname, username)')
+      .order('is_featured', { ascending: false })
       .order('created_at', { ascending: false });
     if (!isAdmin) query = query.eq('user_id', user.id);
     const { data, error: postsError } = await query;
@@ -207,6 +208,7 @@ const ProfilePosts = () => {
     const { error: featuredError } = await supabase.rpc('set_featured_post', { p_post_id: post.id });
     if (featuredError) { setError(`Não foi possível definir o destaque. ${featuredError.message || ''}`); return; }
     setMsg(`"${post.title}" é o post em destaque.`);
+    setPage(1);
     load();
   };
 

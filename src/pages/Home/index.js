@@ -20,12 +20,19 @@ import { useState, useEffect } from 'react';
 // Link
 import { Link } from 'react-router-dom';
 
+const DEFAULT_LANDING_PRODUCTS = [
+  { name: 'ITALIAN COFFEE CIMBALI M24 SELECT', availability: 'Disponível para locação e venda' },
+  { name: 'ITALIAN COFFEE ELITE', availability: 'Disponível para locação e venda' },
+  { name: 'JURA IMPRESSA XF50', availability: 'Disponível para locação' },
+  { name: 'JURA IMPRESSA XS90 OTC', availability: 'Disponível para venda' },
+];
 
 const Home = () => {
     
      // State variables
      const [featuredPost, setFeaturedPost] = useState(null);
      const [recentPosts, setRecentPosts] = useState([]);
+     const [featuredProducts, setFeaturedProducts] = useState([]);
 
      // Faça isso quando o componente montar
      useEffect(() => {
@@ -62,6 +69,25 @@ const Home = () => {
          loadBlog();
      }, [])
 
+     useEffect(() => {
+         supabase
+             .from('products')
+             .select('id, name, available, image_url')
+             .eq('is_featured', true)
+             .order('created_at', { ascending: true })
+             .limit(4)
+             .then(({ data, error }) => {
+                 if (error) { console.error('Erro ao buscar produtos em destaque:', error); return; }
+                 setFeaturedProducts(data || []);
+             });
+     }, []);
+
+     const featuredNames = new Set(featuredProducts.map((product) => product.name?.trim().toLowerCase()));
+     const landingProducts = [
+         ...featuredProducts,
+         ...DEFAULT_LANDING_PRODUCTS.filter((product) => !featuredNames.has(product.name.toLowerCase())),
+     ].slice(0, 4);
+
 
     return (
         <>
@@ -78,58 +104,17 @@ const Home = () => {
             
                 <section className="container">
                     <div className="row">
-                        <div className="grid-6 br-pd">
-                            <div className="products-box">
-                                <div className="products-name">
-                                    <Link to="/products" className="link-title">
-                                        <h5>ITALIAN COFFEE CIMBALI M24 SELECT</h5>
-                                    </Link>
-                                    <h6>Disponível para locação e venda</h6>
-                                    <div className="spacing-btn">
-                                        <Link to="/contact" className="btn-prod">Consultar</Link>
+                        {landingProducts.map((product) => (
+                            <div key={product.id || product.name} className="grid-6 br-pd">
+                                <div className="products-box" style={product.image_url ? { backgroundImage: `url(${product.image_url})` } : undefined}>
+                                    <div className="products-name">
+                                        <Link to="/products" className="link-title"><h5>{product.name}</h5></Link>
+                                        <h6>{product.availability || (product.available ? 'Disponível para venda e locação' : 'Indisponível no momento')}</h6>
+                                        <div className="spacing-btn"><Link to="/contact" className="btn-prod">Consultar</Link></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="grid-6">
-                            <div className="products-box">
-                                <div className="products-name">
-                                    <Link to="/products" className="link-title">
-                                        <h5>ITALIAN COFFEE ELITE</h5>
-                                    </Link>
-                                    <h6>Disponível para locação e venda</h6>
-                                    <div className="spacing-btn">
-                                        <Link to="/contact" className="btn-prod">Consultar</Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid-6">
-                            <div className="products-box">
-                                <div className="products-name">
-                                    <Link to="/products" className="link-title">
-                                        <h5>JURA IMPRESSA XF50</h5>
-                                    </Link>
-                                    <h6>Disponível para locação</h6>
-                                    <div className="spacing-btn">
-                                        <Link to="/contact" className="btn-prod">Consultar</Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid-6">
-                            <div className="products-box">
-                                <div className="products-name">
-                                    <Link to="/products" className="link-title">
-                                        <h5>JURA IMPRESSA XS90 OTC</h5>
-                                    </Link>
-                                    <h6>Disponível para venda</h6>
-                                    <div className="spacing-btn">
-                                        <Link to="/contact" className="btn-prod">Consultar</Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
                     <div className="more-products">

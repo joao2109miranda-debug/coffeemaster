@@ -44,6 +44,7 @@ const AllPosts = () => {
       let query = supabase
         .from('posts')
         .select('*, profiles(name, surname, username, image_profile)', { count: 'exact' })
+        .order('is_featured', { ascending: false })
         .order('date', { ascending: sort === 'old' })
         .order('created_at', { ascending: sort === 'old' })
         .range((page - 1) * POSTS_PER_PAGE, page * POSTS_PER_PAGE - 1);

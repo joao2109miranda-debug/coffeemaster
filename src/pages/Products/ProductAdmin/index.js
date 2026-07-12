@@ -55,6 +55,7 @@ const ProductAdmin = () => {
     const { data, error } = await supabase
       .from("products")
       .select("*")
+      .order("is_featured", { ascending: false })
       .order("created_at", { ascending: true });
     if (error) console.error("Erro ao buscar produtos:", error);
     else setProducts(data || []);
@@ -160,6 +161,23 @@ const ProductAdmin = () => {
       return;
     }
     if (form.id === p.id) resetForm();
+    loadProducts();
+  };
+
+  const toggleFeatured = async (product) => {
+    setError("");
+    setMsg("");
+    const nextFeatured = !product.is_featured;
+    const { error: featuredError } = await supabase.rpc("set_featured_product", {
+      p_product_id: product.id,
+      p_featured: nextFeatured,
+    });
+    if (featuredError) {
+      setError(`Não foi possível alterar o destaque. ${featuredError.message || ""}`);
+      return;
+    }
+    setMsg(nextFeatured ? `"${product.name}" está em destaque na landing.` : `"${product.name}" não está mais em destaque.`);
+    setPage(1);
     loadProducts();
   };
 
@@ -298,6 +316,7 @@ const ProductAdmin = () => {
                 </div>
               </div>
               <div className="m-actions">
+                <button type="button" className={`featured-toggle ${p.is_featured ? "active" : ""}`} onClick={() => toggleFeatured(p)} title={p.is_featured ? "Remover dos destaques" : "Destacar na landing"} aria-label={p.is_featured ? "Remover dos destaques" : "Destacar na landing"}>★</button>
                 <button type="button" className="btn-outline btn-sm" onClick={() => editProduct(p)}>Editar</button>
                 <button type="button" className="btn-danger btn-sm" onClick={() => handleDelete(p)}>Excluir</button>
               </div>

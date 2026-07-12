@@ -81,6 +81,7 @@ const Products = () => {
       return true;
     });
     list = [...list].sort((a, b) => {
+      if (Boolean(a.is_featured) !== Boolean(b.is_featured)) return a.is_featured ? -1 : 1;
       const ta = new Date(a.created_at).getTime();
       const tb = new Date(b.created_at).getTime();
       return sortDesc ? tb - ta : ta - tb;
