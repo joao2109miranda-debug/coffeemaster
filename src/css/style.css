@@ -2087,8 +2087,8 @@ p {
 @media screen and (max-width: 960px) {
   p {
     font-family: 'Rubik', sans-serif;
-    font-size: 24px;
-    line-height: 24px;
+    font-size: 18px;
+    line-height: 1.6;
     font-weight: 200;
   }
   .p-hero {
@@ -2755,8 +2755,8 @@ a {
 @media screen and (max-width: 960px) {
   a {
     font-family: 'Rubik', sans-serif;
-    font-size: 32px;
-    line-height: 26px;
+    font-size: inherit;
+    line-height: inherit;
     font-weight: 200;
     text-decoration: none;
     color: #F7F9FC;
@@ -3830,4 +3830,160 @@ html, body, #root, button, input, select, textarea {
   background: rgba(227, 83, 83, .14);
   color: #e58a8a;
   margin-left: 8px;
+}
+
+/* ================================================================
+   REFORÇO DE FONTE (garante Rubik em qualquer elemento textual)
+   ================================================================ */
+h1, h2, h3, h4, h5, h6, p, a, span, div, li, ul, ol,
+blockquote, label, small, strong, em, td, th, figcaption {
+  font-family: 'Rubik', sans-serif;
+}
+
+/* ================================================================
+   NAV DE FILTROS — estilo minimalista (tabs), atualiza o
+   componente reutilizável SegmentedControl.
+   ================================================================ */
+.toolbar-filters { gap: 22px 44px; }
+
+.seg {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  gap: 2px;
+  border-bottom: 1px solid #241614;
+}
+.seg-item {
+  background: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 10px 2px;
+  margin: 0 14px;
+  color: #8a7f7d;
+  font-weight: 400 !important;
+  position: relative;
+}
+.seg-item:first-child { margin-left: 0; }
+.seg-item:hover { color: #EDE7E2; }
+.seg-item.active { color: #fff; font-weight: 500 !important; }
+.seg-item.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #E35353;
+  border-radius: 2px;
+}
+.seg-count {
+  background: none !important;
+  color: #6f6360 !important;
+  font-size: 12px;
+  padding: 0 0 0 6px;
+}
+.seg-item.active .seg-count { color: #E35353 !important; }
+
+@media screen and (max-width: 680px) {
+  .seg { width: 100%; overflow-x: auto; }
+  .seg-item { flex: 0 0 auto; margin: 0 12px; }
+}
+
+/* ================================================================
+   RESPONSIVIDADE — base compacta para mobile
+   ================================================================ */
+.seg-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #5e2828 transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.seg-scroll::-webkit-scrollbar { height: 4px; }
+.seg-scroll::-webkit-scrollbar-thumb { background: #5e2828; border-radius: 99px; }
+.seg-scroll .seg { width: max-content; min-width: 100%; flex-wrap: nowrap; }
+
+@media screen and (max-width: 680px) {
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { overflow-x: hidden; }
+
+  h1 { font-size: 40px; line-height: 1.12; }
+  h2 { font-size: 34px; line-height: 1.16; }
+  h3 { font-size: 30px; line-height: 1.2; }
+  h4 { font-size: 23px; line-height: 1.28; }
+  h5 { font-size: 19px; line-height: 1.35; }
+  h6 { font-size: 15px; line-height: 1.45; }
+  p { font-size: 16px; line-height: 1.58; }
+  a { font-size: inherit; line-height: inherit; }
+  input, select, option, textarea { font-size: 16px; line-height: 1.45; }
+
+  .page-wrap { padding: 104px 20px 52px; }
+  .page-head { margin-bottom: 22px; }
+  .page-head.flex-space { flex-wrap: wrap; align-items: flex-start; }
+  .page-head.flex-space > :first-child { min-width: 0; }
+  .page-head .btn-outline { margin-top: 4px; }
+
+  header { min-height: 80px; }
+  .logo { max-width: 74px; }
+  .menu-mobile .nav-mobile { margin-top: 80px; }
+  .menu-mobile li .link-menu-mobile { padding: 20px; font-size: 18px; line-height: 1.35; }
+
+  .toolbar { gap: 14px; margin-bottom: 22px; }
+  .toolbar-top { align-items: stretch; gap: 10px; }
+  .toolbar-top > * { width: 100%; }
+  .search-field { width: 100%; min-width: 0; padding: 11px 14px; }
+  .search-field input { font-size: 15px; }
+  .toolbar-filters { display: block; }
+  .toolbar-filters .seg-group + .seg-group { margin-top: 18px; }
+  .seg-group.inline { display: block; }
+  .seg { border-bottom-color: #2c1a19; }
+  .seg-item { flex: 0 0 auto; margin: 0 12px; padding: 9px 2px; font-size: 13px; }
+  .seg-item:first-child { margin-left: 0; }
+  .results-meta { margin-top: 2px; font-size: 13px; }
+
+  .blog-post-card__content { min-height: 0; padding: 16px; }
+  .blog-post-card__content h4,
+  .blog-home-section .blog-post-card--grid .blog-post-card__content h4 { font-size: 23px; }
+  .blog-post-card--featured .blog-post-card__content h4 { font-size: 25px; }
+  .blog-author { margin-top: 14px; }
+  .blog-home-section { padding: 0 20px !important; }
+
+  .product-card { margin: 20px auto; }
+  .product-info h4 { font-size: 25px; }
+  .products-box { min-height: 310px; }
+  .products-name { padding: 24px; }
+
+  .manage-row { align-items: flex-start; flex-wrap: wrap; padding: 14px; }
+  .manage-row .m-left { min-width: 0; }
+  .manage-row .m-actions { width: 100%; flex-wrap: wrap; }
+  .dash-header { align-items: flex-start; flex-wrap: wrap; gap: 14px; padding: 18px; }
+  .dash-avatar { width: 68px; height: 68px; }
+  .dash-header h3 { font-size: 27px; }
+  .dash-header .btn-outline { margin-left: auto; }
+  .dash-grid { grid-template-columns: 1fr; gap: 12px; }
+  .dash-card { padding: 18px; }
+
+  .container-post { padding: 104px 20px 56px; }
+  .post-content,
+  .post-content p,
+  .post-content li,
+  .post-content blockquote { font-size: 17px; line-height: 1.7; }
+  .post-divider { margin: 34px 0; }
+
+  footer .container { padding: 44px 20px 20px; }
+  footer .grid-3, footer .grid-6, footer .grid-9 { margin: 10px 0; width: 100%; }
+  footer h4 { font-size: 21px; }
+  footer p { font-size: 15px; line-height: 1.55; }
+  footer .link-footer { display: block; padding: 5px 0; font-size: 15px; }
+  footer .link-footer:hover { padding-left: 6px; }
+  .footer-subscribe { flex-direction: column; align-items: stretch; gap: 10px; }
+  .footer-subscribe input { width: 100%; }
+  .footer-subscribe .btn { width: 100%; margin-left: 0; text-align: center; font-size: 15px; line-height: 1.3; }
+  .footer-legal { padding-top: 18px; border-top: 1px solid #2c1a19; }
+  .footer-legal p { font-size: 14px; }
+  .footer-legal a { font-size: inherit; }
+
+  .whatsapp-float { right: 16px !important; bottom: 16px !important; transform: scale(.9); transform-origin: bottom right; }
 }

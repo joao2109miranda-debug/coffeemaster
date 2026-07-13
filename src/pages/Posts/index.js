@@ -69,11 +69,12 @@ const Posts = () => {
           />
         </div>
 
-        {/* Assinatura do autor — bio alinhada à esquerda */}
+        {/* Assinatura do autor — card centralizado na página */}
         <div className="post-divider" aria-hidden="true" />
 
         <div className="row">
-          <div className="card author-card">
+          <div className="grid-3 disappear"></div>
+          <div className="grid-6 card">
             <div className="row">
               <div className="grid-3 flex-center pl-1">
                 <div className="profile-big">
@@ -87,6 +88,7 @@ const Posts = () => {
               </div>
             </div>
           </div>
+          <div className="grid-3 disappear"></div>
         </div>
 
         <div className="post-divider" aria-hidden="true" />

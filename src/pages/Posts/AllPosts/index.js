@@ -30,10 +30,22 @@ const AllPosts = () => {
   }, [user]);
 
   useEffect(() => {
-    supabase.from('post_categories').select('id, name').order('name').then(({ data, error }) => {
-      if (error) console.error('Erro ao buscar categorias:', error);
-      else setCategories(data || []);
-    });
+    const loadCategories = async () => {
+      const [categoriesResult, postsResult] = await Promise.all([
+        supabase.from('post_categories').select('id, name').order('name'),
+        supabase.from('posts').select('category_id'),
+      ]);
+      if (categoriesResult.error || postsResult.error) {
+        console.error('Erro ao buscar categorias:', categoriesResult.error || postsResult.error);
+        return;
+      }
+      const usage = (postsResult.data || []).reduce((counts, post) => {
+        if (post.category_id) counts[post.category_id] = (counts[post.category_id] || 0) + 1;
+        return counts;
+      }, {});
+      setCategories((categoriesResult.data || []).filter((category) => usage[category.id]));
+    };
+    loadCategories();
   }, []);
 
   useEffect(() => setPage(1), [search, categoryId, sort]);

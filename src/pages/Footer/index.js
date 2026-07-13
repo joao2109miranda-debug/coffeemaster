@@ -53,15 +53,15 @@ const Footer = () => {
                             <p>
                                 Cadastre seu e-mail para receber novidades, notícias e artigos sobre o mundo do café!
                             </p>
-                            <div className="flex-start-row mt-2">
+                            <div className="flex-start-row mt-2 footer-subscribe">
                                 <input type="text" name="search" id="" placeholder="Digite seu e-mail aqui" />
-                                <Link to="/"><button className="btn ml-2 btn-click">Cadastrar</button></Link>
+                                <Link to="/" className="btn ml-2 btn-click">Cadastrar</Link>
                             </div>
                         </div>
                     </div>
 
                     <div className="row">
-                        <div className="grid-9">
+                        <div className="grid-9 footer-legal">
                             <p>2026 | Todos os direitos reservados. Projeto desenvolvido por <a href="https://w.app/digiconnecta" target="_blank" rel="noopener noreferrer">Digiconnecta.</a> </p>
                         </div>
 
